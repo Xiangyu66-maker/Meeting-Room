@@ -64,9 +64,9 @@ seat_card_04: Seat 4 = square
 `screen_01` has an inactive child GameObject named `Screen Symbol Number Mapping Clue`. Student 2 or the interaction layer should activate it when `remote_01` is used. It displays:
 
 ```text
-triangle = 7
+triangle = 4
 circle = 3
-square = 9
+square = 2
 star = 1
 ```
 
@@ -94,17 +94,17 @@ Seat 4 = square
 Screen mapping:
 
 ```text
-triangle = 7
+triangle = 4
 circle = 3
-square = 9
+square = 2
 star = 1
 ```
 
 Developer-only solution:
 
 ```text
-circle, star, triangle, square = 3, 1, 7, 9
-Temporary playtest password = 3142
+circle, star, triangle, square = 3, 1, 4, 2
+Password = 3142
 ```
 
 ## 7. Notes For Student 2: HTG / Puzzle Graph
