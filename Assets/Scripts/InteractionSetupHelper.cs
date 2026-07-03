@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -7,7 +7,7 @@ using UnityEngine;
 public sealed class InteractionSetupHelper : MonoBehaviour
 {
     [SerializeField] private bool runOnAwake = true;
-    [SerializeField] private bool runInEditMode = true;
+    [SerializeField] private bool runSetupInEditMode = true;
     [SerializeField] private bool addFirstPersonInteractorToCamera = true;
 
     private static readonly HashSet<string> ImportantObjectIds = new HashSet<string>
@@ -64,7 +64,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
 
     private void OnEnable()
     {
-        if (!Application.isPlaying && runInEditMode)
+        if (!Application.isPlaying && runSetupInEditMode)
         {
             SetupSceneInteractions();
         }
@@ -73,7 +73,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     [ContextMenu("Setup Scene Interactions")]
     public void SetupSceneInteractions()
     {
-        ObjectIdentity[] identities = FindObjectsOfType<ObjectIdentity>();
+        ObjectIdentity[] identities = FindObjectsByType<ObjectIdentity>(FindObjectsSortMode.None);
         Dictionary<string, ObjectIdentity> byId = new Dictionary<string, ObjectIdentity>();
 
         foreach (ObjectIdentity identity in identities)
@@ -94,7 +94,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
 
         if (addFirstPersonInteractorToCamera)
         {
-            EnsureFirstPersonInteractor();
+            EnsureCameraGuidanceComponents();
         }
 
         Debug.Log($"Interaction setup complete. Found {byId.Count} ObjectIdentity components.", this);
@@ -180,18 +180,18 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         keypad.ConfigureDoor(door);
     }
 
-    private static void EnsureFirstPersonInteractor()
+    private static void EnsureCameraGuidanceComponents()
     {
         Camera targetCamera = Camera.main;
         if (targetCamera == null)
         {
-            Camera[] cameras = FindObjectsOfType<Camera>();
+            Camera[] cameras = FindObjectsByType<Camera>(FindObjectsSortMode.None);
             targetCamera = cameras.Length > 0 ? cameras[0] : null;
         }
 
         if (targetCamera == null)
         {
-            Debug.LogWarning("No camera found for FirstPersonInteractor setup.");
+            Debug.LogWarning("No camera found for guidance setup.");
             return;
         }
 
@@ -199,6 +199,18 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         {
             targetCamera.gameObject.AddComponent<FirstPersonInteractor>();
             Debug.Log($"Added FirstPersonInteractor to camera {targetCamera.name}.", targetCamera);
+        }
+
+        if (targetCamera.GetComponent<CameraPromptSender>() == null)
+        {
+            targetCamera.gameObject.AddComponent<CameraPromptSender>();
+            Debug.Log($"Added CameraPromptSender to camera {targetCamera.name}.", targetCamera);
+        }
+
+        if (targetCamera.GetComponent<MeetingRoomAdaptiveGuide>() == null)
+        {
+            targetCamera.gameObject.AddComponent<MeetingRoomAdaptiveGuide>();
+            Debug.Log($"Added MeetingRoomAdaptiveGuide to camera {targetCamera.name}.", targetCamera);
         }
     }
 
@@ -214,3 +226,4 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         public string Description { get; }
     }
 }
+

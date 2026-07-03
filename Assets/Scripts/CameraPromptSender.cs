@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,9 +14,13 @@ public sealed class CameraPromptSender : MonoBehaviour
 
     [Header("Task Context")]
     [TextArea(3, 10)]
-    [SerializeField] private string currentTask = "Help the player decide the next useful interaction in the meeting-room puzzle.";
+    [SerializeField] private string currentTask = "Help the player solve the Meeting-Room escape puzzle by inspecting the whiteboard clue, searching chair and seat-card clues for the door password, then using the keypad to open the locked door.";
     [SerializeField] private KeyCode sendKey = KeyCode.G;
     [SerializeField] private bool sendOnStart;
+
+    [Header("Adaptive Guidance")]
+    [SerializeField] private MeetingRoomAdaptiveGuide adaptiveGuide;
+    [SerializeField] private bool useAdaptiveGuideContext = true;
 
     [Header("Player Source")]
     [SerializeField] private Transform playerTransform;
@@ -28,7 +33,7 @@ public sealed class CameraPromptSender : MonoBehaviour
     [Range(1, 100)]
     [SerializeField] private int jpgQuality = 70;
 
-    [Header("Target Object Sent To FastAPI")]
+    [Header("Fallback Target Object Sent To FastAPI")]
     [SerializeField] private Transform targetTransform;
     [SerializeField] private string targetId = "whiteboard_01";
     [SerializeField] private string targetName = "Whiteboard";
@@ -131,6 +136,11 @@ public sealed class CameraPromptSender : MonoBehaviour
                     Debug.Log($"AI vision text: {guideResponse.vision_text}", this);
                 }
 
+                if (guideResponse != null)
+                {
+                    MeetingRoomAdaptiveGuide.NotifyAiInstruction(guideResponse.instruction, guideResponse.vision_text);
+                }
+
                 if (logResponse)
                 {
                     Debug.Log($"AI guide response. HTTP {statusCode}:\n{responseText}", this);
@@ -145,30 +155,76 @@ public sealed class CameraPromptSender : MonoBehaviour
     {
         Transform playerSource = ResolvePlayerTransform();
         Vector3 playerPosition = playerSource != null ? playerSource.position : transform.position;
-        Vector3 objectPosition = targetTransform != null ? targetTransform.position : targetPosition;
-        string objectName = targetTransform != null && !string.IsNullOrWhiteSpace(targetTransform.name) ? targetTransform.name : targetName;
+        string taskContext = BuildTaskContext();
+        SceneObject[] sceneObjects = BuildSceneObjects();
 
         GuideRequest payload = new GuideRequest
         {
             player_position = ToPosition(playerPosition),
-            current_task = currentTask,
-            objects = new[]
-            {
-                new SceneObject
-                {
-                    id = targetId,
-                    name = objectName,
-                    type = targetType,
-                    tag = targetTag,
-                    position = ToPosition(objectPosition),
-                    role = targetRole,
-                    state = targetState,
-                }
-            },
+            current_task = taskContext,
+            objects = sceneObjects,
             image_base64 = imageBase64,
         };
 
         return JsonUtility.ToJson(payload);
+    }
+
+    private string BuildTaskContext()
+    {
+        if (useAdaptiveGuideContext && adaptiveGuide != null)
+        {
+            return adaptiveGuide.BuildAiTaskContext(currentTask);
+        }
+
+        return currentTask;
+    }
+
+    private SceneObject[] BuildSceneObjects()
+    {
+        List<SceneObject> sceneObjects = new List<SceneObject>();
+
+        if (useAdaptiveGuideContext && adaptiveGuide != null)
+        {
+            List<MeetingRoomAdaptiveGuide.GuideObjectState> adaptiveObjects = adaptiveGuide.GetGuideObjectsForAi();
+            foreach (MeetingRoomAdaptiveGuide.GuideObjectState adaptiveObject in adaptiveObjects)
+            {
+                if (adaptiveObject == null || string.IsNullOrWhiteSpace(adaptiveObject.id))
+                {
+                    continue;
+                }
+
+                sceneObjects.Add(new SceneObject
+                {
+                    id = adaptiveObject.id,
+                    name = string.IsNullOrWhiteSpace(adaptiveObject.name) ? adaptiveObject.id : adaptiveObject.name,
+                    type = adaptiveObject.type,
+                    tag = "Untagged",
+                    position = ToPosition(adaptiveObject.position),
+                    role = adaptiveObject.role,
+                    state = adaptiveObject.state,
+                });
+            }
+        }
+
+        if (sceneObjects.Count == 0)
+        {
+            Transform objectTransform = targetTransform != null ? targetTransform : transform;
+            Vector3 objectPosition = targetTransform != null ? targetTransform.position : targetPosition;
+            string objectName = targetTransform != null && !string.IsNullOrWhiteSpace(targetTransform.name) ? targetTransform.name : targetName;
+
+            sceneObjects.Add(new SceneObject
+            {
+                id = targetId,
+                name = objectName,
+                type = targetType,
+                tag = targetTag,
+                position = ToPosition(objectPosition),
+                role = targetRole,
+                state = targetState,
+            });
+        }
+
+        return sceneObjects.ToArray();
     }
 
     private string CaptureCameraImageBase64()
@@ -214,6 +270,16 @@ public sealed class CameraPromptSender : MonoBehaviour
         if (captureCamera == null)
         {
             captureCamera = GetComponent<Camera>();
+        }
+
+        if (adaptiveGuide == null)
+        {
+            adaptiveGuide = GetComponent<MeetingRoomAdaptiveGuide>();
+        }
+
+        if (adaptiveGuide == null)
+        {
+            adaptiveGuide = FindFirstObjectByType<MeetingRoomAdaptiveGuide>();
         }
     }
 
@@ -275,3 +341,4 @@ public sealed class CameraPromptSender : MonoBehaviour
         public string vision_text;
     }
 }
+

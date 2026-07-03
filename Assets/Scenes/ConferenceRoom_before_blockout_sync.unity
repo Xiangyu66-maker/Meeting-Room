@@ -12873,11 +12873,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraPromptSender
   endpointUrl: http://127.0.0.1:8000/guide
-  prompt: You are an XR task tutor. Give one short movement instruction to guide
-    the player toward the Whiteboard.
+  currentTask: Help the player decide the next useful interaction in the meeting-room
+    puzzle.
   sendKey: 103
-  sendOnStart: 1
+  sendOnStart: 0
+  adaptiveGuide: {fileID: 0}
+  useAdaptiveGuideContext: 1
   playerTransform: {fileID: 0}
+  captureCamera: {fileID: 0}
+  includeCameraImage: 1
+  captureWidth: 512
+  captureHeight: 288
+  jpgQuality: 70
   targetTransform: {fileID: 0}
   targetId: whiteboard_01
   targetName: Whiteboard
@@ -12888,6 +12895,29 @@ MonoBehaviour:
   targetState: idle
   logRequest: 1
   logResponse: 1
+  logVisionText: 1
+--- !u!114 &763742711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 763742701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1521feef82526e84ab3d31e263e4c08c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeetingRoomAdaptiveGuide
+  promptSender: {fileID: 0}
+  playerTransform: {fileID: 0}
+  stuckSeconds: 20
+  requestAiOnStageChange: 1
+  requestAiWhenStuck: 1
+  repeatAiRequestSeconds: 20
+  enableHighlight: 1
+  highlightColor: {r: 1, g: 0.82, b: 0.18, a: 1}
+  highlightPulseSpeed: 3
+  showDebugOverlay: 1
 --- !u!1 &764006865
 GameObject:
   m_ObjectHideFlags: 0
@@ -15685,6 +15715,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 763742703}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 763742711}
   m_SourcePrefab: {fileID: 100100000, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
 --- !u!1 &935997709
 GameObject:

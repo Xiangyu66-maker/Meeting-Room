@@ -2,6 +2,61 @@
 
 本项目用于连接 Unity 会议室场景与本地 FastAPI AI 指导后端。
 
+## v0.1
+
+本版本在 Unity 端加入了会议室逃脱任务的自适应 AI 引导。当前主要任务流程为：
+
+```text
+观察白板提示
+-> 搜索椅子 / 座位卡上的密码线索
+-> 前往门旁 keypad_01 输入密码
+-> 打开 locked_door_01 完成逃脱
+```
+
+新增脚本：
+
+```text
+Assets/Scripts/MeetingRoomAdaptiveGuide.cs
+```
+
+该脚本负责在 Unity 本地维护任务阶段，并把当前诊断结果交给 `CameraPromptSender.cs` 发送给 FastAPI。它会记录玩家已经交互过的关键物体，例如 `whiteboard_01`、`seat_card_01` 到 `seat_card_04`、`keypad_01`，并根据进度判断下一步目标。
+
+当前自适应阶段包括：
+
+- `FindWhiteboard`：玩家还没有观察白板时，高亮 `whiteboard_01`。
+- `SearchSeatClues`：玩家已经观察白板，但还没有看完座位卡时，高亮下一个未观察的 `seat_card`。
+- `UseKeypad`：座位卡线索已观察完，引导玩家前往 `keypad_01`。
+- `EnterPassword`：玩家正在输入密码；如果输入错误，引导玩家重新检查椅子 / 座位线索。
+- `Completed`：门已解锁，任务完成。
+
+`CameraPromptSender.cs` 已更新为支持自适应上下文。发送给 FastAPI 的 `current_task` 不再只是普通任务描述，而会自动加入：
+
+- 已知任务流程。
+- 当前任务阶段。
+- 推荐目标物体。
+- 已观察 / 已交互物体。
+- 密码输入失败次数。
+- 当前阶段停留时间。
+- 上一次 VLM 视觉分析结果。
+
+Unity 端发送给 FastAPI 的 `objects` 也会包含更多关键对象状态，例如：
+
+- `whiteboard_01`
+- `seat_card_01` 到 `seat_card_04`
+- `chair_01` 到 `chair_10`
+- `keypad_01`
+- `locked_door_01`
+- `victory_exit_point`
+
+相关交互事件已经接入自适应引导：
+
+- `InteractableObject.cs`：玩家交互白板、座位卡、keypad、门时通知引导系统。
+- `KeypadController.cs`：开始输入、密码错误、密码正确时通知引导系统。
+- `DoorController.cs`：门解锁时通知引导系统。
+- `InteractionSetupHelper.cs`：确保主相机上挂载 `FirstPersonInteractor`、`CameraPromptSender` 和 `MeetingRoomAdaptiveGuide`。
+
+当前场景中 `MainCamera` 已挂载自适应引导相关组件。进入 Play 模式后，系统会根据玩家进度自动高亮下一目标，并在阶段变化或玩家停留过久时请求 FastAPI / AI 生成新的指导文本。
+
 ## Unity 到 FastAPI 的整体桥接流程
 
 当前链路如下：
@@ -97,3 +152,6 @@ Player/MainCamera
 - `Log Request`：是否在 Console 中输出请求日志。
 - `Log Response`：是否在 Console 中输出完整后端响应。
 - `Log Vision Text`：是否输出 FastAPI 返回的视觉分析文本 `vision_text`。
+
+
+

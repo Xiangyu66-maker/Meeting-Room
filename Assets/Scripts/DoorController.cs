@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [DisallowMultipleComponent]
 [AddComponentMenu("Conference Room/Door Controller")]
@@ -52,5 +52,6 @@ public sealed class DoorController : MonoBehaviour
         isUnlocked = true;
         isOpening = true;
         Debug.Log("Door unlocked. Opening door.", this);
+        MeetingRoomAdaptiveGuide.NotifyDoorUnlocked();
     }
 }
