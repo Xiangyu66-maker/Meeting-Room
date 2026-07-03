@@ -12860,6 +12860,34 @@ MonoBehaviour:
   interactionRange: 3
   interactKey: 101
   showDebugPrompt: 1
+--- !u!114 &763742705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 763742701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24a08a2aa6945de4f8e0af92f48e2544, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraPromptSender
+  endpointUrl: http://127.0.0.1:8000/guide
+  prompt: You are an XR task tutor. Give one short movement instruction to guide
+    the player toward the Whiteboard.
+  sendKey: 103
+  sendOnStart: 1
+  playerTransform: {fileID: 0}
+  targetTransform: {fileID: 0}
+  targetId: whiteboard_01
+  targetName: Whiteboard
+  targetType: puzzle_clue
+  targetTag: Untagged
+  targetPosition: {x: 0, y: 1.5, z: 4}
+  targetRole: target
+  targetState: idle
+  logRequest: 1
+  logResponse: 1
 --- !u!1 &764006865
 GameObject:
   m_ObjectHideFlags: 0
@@ -15649,6 +15677,10 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 763742705}
     - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
         type: 3}
       insertIndex: -1
