@@ -54,6 +54,8 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         { "plant_04", new Metadata("distractor", "Small table plant distractor.") },
     };
 
+    private static readonly Dictionary<Font, Material> DepthTextMaterials = new Dictionary<Font, Material>();
+
     private void Awake()
     {
         if (Application.isPlaying && runOnAwake)
@@ -68,6 +70,12 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         {
             SetupSceneInteractions();
         }
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void ApplyTextDepthMaterialsAfterSceneLoad()
+    {
+        ApplyDepthTestedTextMaterials();
     }
 
     [ContextMenu("Setup Scene Interactions")]
@@ -91,6 +99,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
 
         DoorController door = EnsureDoorController(byId);
         EnsureKeypadController(byId, door);
+        ApplyDepthTestedTextMaterials();
 
         if (addFirstPersonInteractorToCamera)
         {
@@ -178,6 +187,84 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         }
 
         keypad.ConfigureDoor(door);
+    }
+
+    private static void ApplyDepthTestedTextMaterials()
+    {
+        Shader textShader = Shader.Find("ConferenceRoom/World Text Depth");
+        if (textShader == null)
+        {
+            Debug.LogWarning("World Text Depth shader not found. Scene TextMesh labels may render through objects.");
+            return;
+        }
+
+        int updatedCount = 0;
+        TextMesh[] textMeshes = FindSceneTextMeshes();
+        foreach (TextMesh textMesh in textMeshes)
+        {
+            if (textMesh == null || textMesh.font == null)
+            {
+                continue;
+            }
+
+            MeshRenderer renderer = textMesh.GetComponent<MeshRenderer>();
+            if (renderer == null)
+            {
+                continue;
+            }
+
+            textMesh.font.RequestCharactersInTexture(textMesh.text, textMesh.fontSize, textMesh.fontStyle);
+            Material material = GetDepthTextMaterial(textMesh.font, textShader);
+            if (material == null)
+            {
+                continue;
+            }
+
+            renderer.sharedMaterial = material;
+            updatedCount++;
+        }
+
+        if (updatedCount > 0)
+        {
+            Debug.Log($"Applied depth-tested text material to {updatedCount} TextMesh labels.");
+        }
+    }
+
+    private static TextMesh[] FindSceneTextMeshes()
+    {
+#if UNITY_2023_1_OR_NEWER
+        return FindObjectsByType<TextMesh>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+#else
+        return FindObjectsOfType<TextMesh>(true);
+#endif
+    }
+
+    private static Material GetDepthTextMaterial(Font font, Shader shader)
+    {
+        Texture fontTexture = font.material != null ? font.material.mainTexture : null;
+
+        if (DepthTextMaterials.TryGetValue(font, out Material material) && material != null && material.shader == shader)
+        {
+            if (fontTexture != null && material.mainTexture != fontTexture)
+            {
+                material.mainTexture = fontTexture;
+            }
+
+            return material;
+        }
+
+        material = new Material(shader)
+        {
+            name = $"{font.name}_WorldTextDepth",
+            hideFlags = HideFlags.HideAndDontSave,
+            mainTexture = fontTexture,
+            color = Color.white,
+            renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest,
+        };
+
+        material.SetFloat("_Cutoff", 0.1f);
+        DepthTextMaterials[font] = material;
+        return material;
     }
 
     private static void EnsureFirstPersonInteractor()

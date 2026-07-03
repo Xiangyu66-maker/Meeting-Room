@@ -10,11 +10,18 @@ public sealed class GameTimerUI : MonoBehaviour
     [SerializeField] private bool useTopPlacement = true;
     [SerializeField] private float lowTimeThresholdSeconds = 60f;
     [SerializeField] private bool useTextMeshProWhenAvailable = true;
+    [SerializeField] private float barWidth = 900f;
+    [SerializeField] private float barHeight = 34f;
+    [SerializeField] private float edgeOffset = 54f;
+    [SerializeField] private bool showImmediateModeFallback = true;
 
+    private GameObject canvasObject;
     private RectTransform fillRect;
     private Image fillImage;
+    private Image backgroundImage;
     private Component tmpText;
     private Text uiText;
+    private bool finalVisualLocked;
 
     private void Awake()
     {
@@ -31,42 +38,80 @@ public sealed class GameTimerUI : MonoBehaviour
             return;
         }
 
+        if (finalVisualLocked)
+        {
+            return;
+        }
+
         UpdateTimerVisuals();
 
         if (manager.IsGameOver())
         {
-            enabled = false;
-            return;
-        }
-
-        if (GetRemainingSeconds() <= 0f)
-        {
-            manager.FailGame();
-            enabled = false;
+            finalVisualLocked = true;
         }
     }
 
-    private void ResolveManager()
+    private void OnGUI()
     {
-        if (manager == null)
+        if (!showImmediateModeFallback)
         {
-            manager = FindObjectOfType<GameStateManager>();
+            return;
         }
+
+        ResolveManager();
+
+        float remaining = GetRemainingSeconds();
+        float limit = manager != null ? Mathf.Max(0.01f, manager.timeLimitSeconds) : 600f;
+        float fillValue = Mathf.Clamp01(remaining / limit);
+        bool lowTime = remaining <= lowTimeThresholdSeconds;
+
+        float width = Mathf.Min(Screen.width * 0.56f, 900f);
+        float height = Mathf.Clamp(Screen.height * 0.032f, 22f, 34f);
+        float x = (Screen.width - width) * 0.5f;
+        float y = useTopPlacement ? 24f : Screen.height - height - 24f;
+
+        int previousDepth = GUI.depth;
+        GUI.depth = -850;
+
+        Color previousColor = GUI.color;
+        GUI.color = new Color(0f, 0f, 0f, 0.68f);
+        GUI.DrawTexture(new Rect(x - 2f, y - 2f, width + 4f, height + 4f), Texture2D.whiteTexture);
+
+        GUI.color = lowTime ? new Color(1f, 0.22f, 0.12f, 0.96f) : new Color(0.15f, 0.86f, 0.38f, 0.96f);
+        GUI.DrawTexture(new Rect(x, y, width * fillValue, height), Texture2D.whiteTexture);
+
+        GUI.color = new Color(1f, 1f, 1f, 0.9f);
+        GUI.DrawTexture(new Rect(x, y, width, 1f), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(x, y + height - 1f, width, 1f), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(x, y, 1f, height), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(x + width - 1f, y, 1f, height), Texture2D.whiteTexture);
+
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = Mathf.Clamp(Mathf.RoundToInt(Screen.height * 0.022f), 18, 28),
+            fontStyle = FontStyle.Bold
+        };
+        labelStyle.normal.textColor = Color.white;
+        GUI.Label(new Rect(x, y - 1f, width, height), $"Time Left: {FormatTime(remaining)}", labelStyle);
+
+        GUI.color = previousColor;
+        GUI.depth = previousDepth;
     }
 
     private void EnsureUI()
     {
-        if (fillRect != null)
+        if (fillImage != null)
         {
             return;
         }
 
-        GameObject canvasObject = new GameObject("Game Timer Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject = new GameObject("Game Timer Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         canvasObject.transform.SetParent(transform, false);
 
         Canvas canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 90;
+        canvas.sortingOrder = 4800;
 
         CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -79,8 +124,8 @@ public sealed class GameTimerUI : MonoBehaviour
         rootRect.anchorMin = useTopPlacement ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
         rootRect.anchorMax = rootRect.anchorMin;
         rootRect.pivot = useTopPlacement ? new Vector2(0.5f, 1f) : new Vector2(0.5f, 0f);
-        rootRect.anchoredPosition = useTopPlacement ? new Vector2(0f, -18f) : new Vector2(0f, 18f);
-        rootRect.sizeDelta = new Vector2(760f, 56f);
+        rootRect.anchoredPosition = useTopPlacement ? new Vector2(0f, -edgeOffset) : new Vector2(0f, edgeOffset);
+        rootRect.sizeDelta = new Vector2(barWidth, 62f);
 
         GameObject background = new GameObject("Timer Bar Background", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         background.transform.SetParent(timerRoot.transform, false);
@@ -90,10 +135,14 @@ public sealed class GameTimerUI : MonoBehaviour
         backgroundRect.anchorMax = new Vector2(0.5f, 0f);
         backgroundRect.pivot = new Vector2(0.5f, 0f);
         backgroundRect.anchoredPosition = new Vector2(0f, 4f);
-        backgroundRect.sizeDelta = new Vector2(760f, 24f);
+        backgroundRect.sizeDelta = new Vector2(barWidth, barHeight);
 
-        Image backgroundImage = background.GetComponent<Image>();
+        backgroundImage = background.GetComponent<Image>();
         backgroundImage.color = new Color(0f, 0f, 0f, 0.55f);
+
+        Outline backgroundOutline = background.AddComponent<Outline>();
+        backgroundOutline.effectColor = new Color(1f, 1f, 1f, 0.22f);
+        backgroundOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
         GameObject fill = new GameObject("Timer Bar Fill", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         fill.transform.SetParent(background.transform, false);
@@ -116,23 +165,26 @@ public sealed class GameTimerUI : MonoBehaviour
         textRect.anchorMax = new Vector2(0.5f, 1f);
         textRect.pivot = new Vector2(0.5f, 1f);
         textRect.anchoredPosition = new Vector2(0f, -2f);
-        textRect.sizeDelta = new Vector2(760f, 28f);
+        textRect.sizeDelta = new Vector2(barWidth, 30f);
 
         if (!TryCreateTextMeshProText(textObject))
         {
             uiText = textObject.AddComponent<Text>();
             uiText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            uiText.fontSize = 22;
+            uiText.fontSize = 26;
             uiText.color = Color.white;
+            uiText.fontStyle = FontStyle.Bold;
             uiText.alignment = TextAnchor.MiddleCenter;
             uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
             uiText.verticalOverflow = VerticalWrapMode.Overflow;
         }
+
+        Debug.Log("GameTimerUI created countdown progress bar for player view.", this);
     }
 
     private void UpdateTimerVisuals()
     {
-        if (fillRect == null)
+        if (fillImage == null || fillRect == null)
         {
             return;
         }
@@ -148,6 +200,11 @@ public sealed class GameTimerUI : MonoBehaviour
         if (fillImage != null)
         {
             fillImage.color = timerColor;
+        }
+
+        if (backgroundImage != null)
+        {
+            backgroundImage.color = lowTime ? new Color(0.22f, 0f, 0f, 0.62f) : new Color(0f, 0f, 0f, 0.55f);
         }
 
         string label = $"Time Left: {FormatTime(remaining)}";
@@ -170,8 +227,7 @@ public sealed class GameTimerUI : MonoBehaviour
             return 600f;
         }
 
-        float limit = Mathf.Max(0f, manager.timeLimitSeconds);
-        return Mathf.Clamp(limit - manager.GetElapsedTime(), 0f, limit);
+        return manager.GetRemainingTime();
     }
 
     private static string FormatTime(float seconds)
@@ -196,7 +252,7 @@ public sealed class GameTimerUI : MonoBehaviour
         }
 
         tmpText = textObject.AddComponent(tmpType);
-        TrySetProperty(tmpText, "fontSize", 22f);
+        TrySetProperty(tmpText, "fontSize", 26f);
         TrySetProperty(tmpText, "color", Color.white);
         TrySetProperty(tmpText, "enableWordWrapping", false);
 
@@ -220,6 +276,24 @@ public sealed class GameTimerUI : MonoBehaviour
         if (property != null && property.CanWrite)
         {
             property.SetValue(component, value, null);
+        }
+    }
+
+    private void ResolveManager()
+    {
+        if (manager != null)
+        {
+            return;
+        }
+
+        manager = GetComponent<GameStateManager>();
+        if (manager == null)
+        {
+#if UNITY_2023_1_OR_NEWER
+            manager = FindFirstObjectByType<GameStateManager>();
+#else
+            manager = FindObjectOfType<GameStateManager>();
+#endif
         }
     }
 }
