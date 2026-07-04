@@ -9,9 +9,9 @@ from pydantic import BaseModel, Field
 load_dotenv()
 
 API_KEY = os.getenv("KKRICH_API_KEY")
-MODEL_NAME = os.getenv("KKRICH_MODEL", "gpt-5.4-mini")
+MODEL_NAME = os.getenv("KKRICH_MODEL", "gpt-5.5")
 BASE_URL = os.getenv("KKRICH_BASE_URL", "https://api.kkrich.ltd/v1")
-VLM_MODEL_NAME = os.getenv("KKRICH_VLM_MODEL", "gpt-5.4-mini")
+VLM_MODEL_NAME = os.getenv("KKRICH_VLM_MODEL", "gpt-5.5")
 
 client = OpenAI(
     api_key=API_KEY,
