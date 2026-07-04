@@ -97,3 +97,24 @@ VLM analyzes the image and produces vision_text
 LLM combines current_task, Unity objects, and vision_text
 ↓
 Final game-style instruction is generated
+## 后续改进方向：结构化 VLM 输出
+
+当前后端已经可以让 VLM 返回 `vision_text`，用于描述 Unity 截图中的关键内容。但目前的 `vision_text` 主要是自然语言段落，不同模型或不同请求下格式可能不完全一致。
+
+后续可以将 VLM 输出改为结构化格式，例如：
+
+```text
+Visible objects:
+- ...
+
+Readable text / symbols:
+- ...
+
+Interactable elements:
+- ...
+
+Task-related clues:
+- ...
+
+Unity state alignment:
+- ...
