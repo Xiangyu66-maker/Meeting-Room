@@ -28,8 +28,6 @@ FastAPI returns:
 FastAPI/
 ├── main.py                 Main FastAPI backend
 ├── test_main.http          HTTP test file
-├── image_to_base64.py      Helper script for local image-base64 testing
-├── TestResult.docx         Initial API test result document
 └── README.md
 这是环境设置，添加.env到根目录
 KKRICH_API_KEY=your_api_key_here
