@@ -28,6 +28,10 @@ public sealed class InteractableObject : MonoBehaviour
         string objectId = ObjectId;
         string description = GetDescription();
         Debug.Log($"Interacted with: {objectId} | {description}", this);
+        if (GptVisionInteractionManager.Instance != null)
+{
+    GptVisionInteractionManager.Instance.AnalyzeObject(gameObject, objectId, description);
+}
 
         switch (objectId)
         {
