@@ -13,7 +13,7 @@ public sealed class GameTimerUI : MonoBehaviour
     [SerializeField] private float barWidth = 900f;
     [SerializeField] private float barHeight = 34f;
     [SerializeField] private float edgeOffset = 54f;
-    [SerializeField] private bool showImmediateModeFallback = true;
+    [SerializeField] private bool showImmediateModeFallback;
 
     private GameObject canvasObject;
     private RectTransform fillRect;
@@ -53,7 +53,7 @@ public sealed class GameTimerUI : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!showImmediateModeFallback)
+        if (!showImmediateModeFallback || IsCanvasUIReady())
         {
             return;
         }
@@ -97,6 +97,14 @@ public sealed class GameTimerUI : MonoBehaviour
 
         GUI.color = previousColor;
         GUI.depth = previousDepth;
+    }
+
+    private bool IsCanvasUIReady()
+    {
+        return canvasObject != null
+            && canvasObject.activeInHierarchy
+            && fillImage != null
+            && fillImage.isActiveAndEnabled;
     }
 
     private void EnsureUI()
@@ -170,7 +178,7 @@ public sealed class GameTimerUI : MonoBehaviour
         if (!TryCreateTextMeshProText(textObject))
         {
             uiText = textObject.AddComponent<Text>();
-            uiText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            uiText.font = GetBuiltinUIFont();
             uiText.fontSize = 26;
             uiText.color = Color.white;
             uiText.fontStyle = FontStyle.Bold;
@@ -180,6 +188,18 @@ public sealed class GameTimerUI : MonoBehaviour
         }
 
         Debug.Log("GameTimerUI created countdown progress bar for player view.", this);
+    }
+
+    private static Font GetBuiltinUIFont()
+    {
+        try
+        {
+            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+        catch (ArgumentException)
+        {
+            return Resources.GetBuiltinResource<Font>("Arial.ttf");
+        }
     }
 
     private void UpdateTimerVisuals()

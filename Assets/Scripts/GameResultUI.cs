@@ -9,7 +9,7 @@ public sealed class GameResultUI : MonoBehaviour
     private const string SuccessMessage = "Game Success! You escaped the meeting room.";
     private const string FailureMessage = "Game Failed! Time limit exceeded.";
 
-    [SerializeField] private bool useTextMeshProWhenAvailable = false;
+    [SerializeField] private bool useTextMeshProWhenAvailable = true;
 
     private GameObject resultRoot;
     private Component tmpText;
@@ -121,7 +121,7 @@ public sealed class GameResultUI : MonoBehaviour
         if (!TryCreateTextMeshProText(textObject))
         {
             uiText = textObject.AddComponent<Text>();
-            uiText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            uiText.font = GetBuiltinUIFont();
             uiText.fontSize = 56;
             uiText.fontStyle = FontStyle.Bold;
             uiText.color = Color.white;
@@ -132,6 +132,18 @@ public sealed class GameResultUI : MonoBehaviour
             Outline outline = textObject.AddComponent<Outline>();
             outline.effectColor = new Color(0f, 0f, 0f, 0.9f);
             outline.effectDistance = new Vector2(3f, -3f);
+        }
+    }
+
+    private static Font GetBuiltinUIFont()
+    {
+        try
+        {
+            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+        catch (ArgumentException)
+        {
+            return Resources.GetBuiltinResource<Font>("Arial.ttf");
         }
     }
 

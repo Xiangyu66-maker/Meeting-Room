@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public sealed class BackpackUI : MonoBehaviour
 {
     [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private bool showImmediateModeFallback = true;
 
     private Canvas canvas;
     private RectTransform iconRoot;
@@ -36,6 +37,7 @@ public sealed class BackpackUI : MonoBehaviour
         ResolveInventory();
         EnsureUI();
         Hide();
+        ApplyCanvasVisibility();
         UpdateNotificationDot();
     }
 
@@ -120,6 +122,7 @@ public sealed class BackpackUI : MonoBehaviour
     {
         EnsureUI();
         ResolveInventory();
+        ApplyCanvasVisibility();
 
         panelRoot.SetActive(true);
 
@@ -177,6 +180,7 @@ public sealed class BackpackUI : MonoBehaviour
         EnsureEventSystem();
         CreateBackpackIcon();
         CreateBackpackPanel();
+        ApplyCanvasVisibility();
     }
 
     private Canvas FindOrCreateCanvas()
@@ -184,8 +188,11 @@ public sealed class BackpackUI : MonoBehaviour
         Canvas namedCanvas = FindCanvasByName("Backpack Canvas");
         if (namedCanvas != null)
         {
+            namedCanvas.gameObject.SetActive(true);
+            namedCanvas.enabled = true;
             namedCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             namedCanvas.sortingOrder = 5100;
+            ConfigureCanvasScaler(namedCanvas.gameObject);
             if (namedCanvas.GetComponent<GraphicRaycaster>() == null)
             {
                 namedCanvas.gameObject.AddComponent<GraphicRaycaster>();
@@ -198,9 +205,22 @@ public sealed class BackpackUI : MonoBehaviour
         Canvas createdCanvas = canvasObject.AddComponent<Canvas>();
         createdCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
         createdCanvas.sortingOrder = 5100;
-        canvasObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        ConfigureCanvasScaler(canvasObject);
         canvasObject.AddComponent<GraphicRaycaster>();
         return createdCanvas;
+    }
+
+    private static void ConfigureCanvasScaler(GameObject canvasObject)
+    {
+        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+        if (scaler == null)
+        {
+            scaler = canvasObject.AddComponent<CanvasScaler>();
+        }
+
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+        scaler.scaleFactor = 1f;
+        scaler.referencePixelsPerUnit = 100f;
     }
 
     private static Canvas FindCanvasByName(string canvasName)
@@ -247,11 +267,11 @@ public sealed class BackpackUI : MonoBehaviour
 
         GameObject iconObject = CreateUIObject("Backpack Icon", canvas.transform);
         iconRoot = iconObject.GetComponent<RectTransform>();
-        iconRoot.anchorMin = new Vector2(1f, 1f);
-        iconRoot.anchorMax = new Vector2(1f, 1f);
-        iconRoot.pivot = new Vector2(1f, 1f);
-        iconRoot.anchoredPosition = new Vector2(-24f, -88f);
-        iconRoot.sizeDelta = new Vector2(74f, 52f);
+        iconRoot.anchorMin = new Vector2(0.5f, 1f);
+        iconRoot.anchorMax = new Vector2(0.5f, 1f);
+        iconRoot.pivot = new Vector2(0.5f, 1f);
+        iconRoot.anchoredPosition = new Vector2(-330f, -70f);
+        iconRoot.sizeDelta = new Vector2(64f, 40f);
 
         Image iconImage = iconObject.AddComponent<Image>();
         iconImage.color = new Color(0.08f, 0.1f, 0.13f, 0.88f);
@@ -260,7 +280,7 @@ public sealed class BackpackUI : MonoBehaviour
         iconButton.targetGraphic = iconImage;
         iconButton.onClick.AddListener(Toggle);
 
-        TextMeshProUGUI iconText = CreateText("Bag", iconRoot, "Backpack Icon Text", 24f, Color.white, TextAlignmentOptions.Center);
+        TextMeshProUGUI iconText = CreateText("Bag", iconRoot, "Backpack Icon Text", 18f, Color.white, TextAlignmentOptions.Center);
         RectTransform iconTextRect = iconText.rectTransform;
         iconTextRect.anchorMin = Vector2.zero;
         iconTextRect.anchorMax = Vector2.one;
@@ -273,7 +293,7 @@ public sealed class BackpackUI : MonoBehaviour
         dotRect.anchorMax = new Vector2(1f, 1f);
         dotRect.pivot = new Vector2(0.5f, 0.5f);
         dotRect.anchoredPosition = new Vector2(-5f, -5f);
-        dotRect.sizeDelta = new Vector2(16f, 16f);
+        dotRect.sizeDelta = new Vector2(11f, 11f);
 
         Image dotImage = dotObject.AddComponent<Image>();
         dotImage.color = Color.red;
@@ -290,64 +310,67 @@ public sealed class BackpackUI : MonoBehaviour
 
         panelRoot = CreateUIObject("Backpack Panel", canvas.transform);
         RectTransform panelRect = panelRoot.GetComponent<RectTransform>();
-        panelRect.anchorMin = new Vector2(1f, 0.5f);
-        panelRect.anchorMax = new Vector2(1f, 0.5f);
-        panelRect.pivot = new Vector2(1f, 0.5f);
-        panelRect.anchoredPosition = new Vector2(-24f, 0f);
-        panelRect.sizeDelta = new Vector2(460f, 520f);
+        panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+        panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+        panelRect.pivot = new Vector2(0.5f, 0.5f);
+        panelRect.anchoredPosition = Vector2.zero;
+        panelRect.sizeDelta = new Vector2(340f, 270f);
 
         Image panelImage = panelRoot.AddComponent<Image>();
         panelImage.color = new Color(0.06f, 0.07f, 0.08f, 0.94f);
 
-        TextMeshProUGUI title = CreateText("Backpack", panelRect, "Backpack Title", 30f, Color.white, TextAlignmentOptions.Center);
+        TextMeshProUGUI title = CreateText("Backpack", panelRect, "Backpack Title", 20f, Color.white, TextAlignmentOptions.Center);
         RectTransform titleRect = title.rectTransform;
         titleRect.anchorMin = new Vector2(0f, 1f);
         titleRect.anchorMax = new Vector2(1f, 1f);
         titleRect.pivot = new Vector2(0.5f, 1f);
-        titleRect.anchoredPosition = new Vector2(0f, -18f);
-        titleRect.sizeDelta = new Vector2(-36f, 44f);
+        titleRect.anchoredPosition = new Vector2(0f, -10f);
+        titleRect.sizeDelta = new Vector2(-28f, 30f);
 
         GameObject itemListObject = CreateUIObject("Backpack Item List", panelRect);
         itemListRoot = itemListObject.GetComponent<RectTransform>();
         itemListRoot.anchorMin = new Vector2(0f, 0f);
         itemListRoot.anchorMax = new Vector2(0f, 1f);
         itemListRoot.pivot = new Vector2(0f, 1f);
-        itemListRoot.anchoredPosition = new Vector2(24f, -80f);
-        itemListRoot.sizeDelta = new Vector2(160f, -128f);
+        itemListRoot.anchoredPosition = new Vector2(16f, -48f);
+        itemListRoot.sizeDelta = new Vector2(104f, -88f);
 
         GameObject noteDisplayObject = CreateUIObject("Backpack Note Display", panelRect);
         RectTransform noteRect = noteDisplayObject.GetComponent<RectTransform>();
         noteRect.anchorMin = new Vector2(0f, 0f);
         noteRect.anchorMax = new Vector2(1f, 1f);
-        noteRect.offsetMin = new Vector2(204f, 78f);
-        noteRect.offsetMax = new Vector2(-24f, -82f);
+        noteRect.offsetMin = new Vector2(136f, 48f);
+        noteRect.offsetMax = new Vector2(-16f, -48f);
 
         Image noteImage = noteDisplayObject.AddComponent<Image>();
         noteImage.color = new Color(0.92f, 0.88f, 0.72f, 1f);
 
-        noteDisplayText = CreateText(string.Empty, noteRect, "Backpack Note Text", 22f, Color.black, TextAlignmentOptions.TopLeft);
+        noteDisplayText = CreateText(string.Empty, noteRect, "Backpack Note Text", 15f, Color.black, TextAlignmentOptions.TopLeft);
         RectTransform noteTextRect = noteDisplayText.rectTransform;
         noteTextRect.anchorMin = Vector2.zero;
         noteTextRect.anchorMax = Vector2.one;
-        noteTextRect.offsetMin = new Vector2(18f, 18f);
-        noteTextRect.offsetMax = new Vector2(-18f, -18f);
+        noteTextRect.offsetMin = new Vector2(10f, 10f);
+        noteTextRect.offsetMax = new Vector2(-10f, -10f);
         noteDisplayText.textWrappingMode = TextWrappingModes.Normal;
+        noteDisplayText.enableAutoSizing = true;
+        noteDisplayText.fontSizeMin = 9f;
+        noteDisplayText.fontSizeMax = 15f;
 
-        emptyText = CreateText("No notes collected.", panelRect, "Backpack Empty Text", 22f, Color.white, TextAlignmentOptions.Center);
+        emptyText = CreateText("No notes collected.", panelRect, "Backpack Empty Text", 16f, Color.white, TextAlignmentOptions.Center);
         RectTransform emptyRect = emptyText.rectTransform;
         emptyRect.anchorMin = new Vector2(0f, 0.5f);
         emptyRect.anchorMax = new Vector2(1f, 0.5f);
         emptyRect.pivot = new Vector2(0.5f, 0.5f);
         emptyRect.anchoredPosition = new Vector2(0f, 0f);
-        emptyRect.sizeDelta = new Vector2(-48f, 48f);
+        emptyRect.sizeDelta = new Vector2(-36f, 38f);
 
-        TextMeshProUGUI closeText = CreateText("Press Tab to close", panelRect, "Backpack Close Text", 18f, Color.white, TextAlignmentOptions.Center);
+        TextMeshProUGUI closeText = CreateText("Press Tab to close", panelRect, "Backpack Close Text", 13f, Color.white, TextAlignmentOptions.Center);
         RectTransform closeRect = closeText.rectTransform;
         closeRect.anchorMin = new Vector2(0f, 0f);
         closeRect.anchorMax = new Vector2(1f, 0f);
         closeRect.pivot = new Vector2(0.5f, 0f);
-        closeRect.anchoredPosition = new Vector2(0f, 18f);
-        closeRect.sizeDelta = new Vector2(-36f, 34f);
+        closeRect.anchoredPosition = new Vector2(0f, 12f);
+        closeRect.sizeDelta = new Vector2(-28f, 22f);
     }
 
     private void RefreshPanel()
@@ -383,7 +406,7 @@ public sealed class BackpackUI : MonoBehaviour
         foreach (InventoryItem item in items)
         {
             CreateItemButton(item, y);
-            y -= 58f;
+            y -= 38f;
         }
 
         ShowItem(selectedItemId, false);
@@ -397,7 +420,7 @@ public sealed class BackpackUI : MonoBehaviour
         buttonRect.anchorMax = new Vector2(1f, 1f);
         buttonRect.pivot = new Vector2(0.5f, 1f);
         buttonRect.anchoredPosition = new Vector2(0f, y);
-        buttonRect.sizeDelta = new Vector2(0f, 48f);
+        buttonRect.sizeDelta = new Vector2(0f, 32f);
 
         Image buttonImage = buttonObject.AddComponent<Image>();
         buttonImage.color = item.itemId == selectedItemId
@@ -409,12 +432,15 @@ public sealed class BackpackUI : MonoBehaviour
         string capturedItemId = item.itemId;
         button.onClick.AddListener(() => ShowItem(capturedItemId, true));
 
-        TextMeshProUGUI label = CreateText(item.itemName, buttonRect, "Item Label", 18f, Color.black, TextAlignmentOptions.Center);
+        TextMeshProUGUI label = CreateText(item.itemName, buttonRect, "Item Label", 12f, Color.black, TextAlignmentOptions.Center);
         RectTransform labelRect = label.rectTransform;
         labelRect.anchorMin = Vector2.zero;
         labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = new Vector2(8f, 0f);
-        labelRect.offsetMax = new Vector2(-8f, 0f);
+        labelRect.offsetMin = new Vector2(6f, 0f);
+        labelRect.offsetMax = new Vector2(-6f, 0f);
+        label.enableAutoSizing = true;
+        label.fontSizeMin = 8f;
+        label.fontSizeMax = 12f;
     }
 
     private void ShowItem(string itemId, bool markRead)
@@ -473,6 +499,189 @@ public sealed class BackpackUI : MonoBehaviour
         }
 
         redDot.SetActive(inventoryManager.HasUnreadItems());
+    }
+
+    private void OnGUI()
+    {
+        if (!showImmediateModeFallback)
+        {
+            return;
+        }
+
+        ResolveInventory();
+
+        int previousDepth = GUI.depth;
+        Color previousColor = GUI.color;
+        GUI.depth = -920;
+
+        DrawFallbackIcon();
+
+        if (IsOpen)
+        {
+            DrawFallbackPanel();
+        }
+
+        GUI.color = previousColor;
+        GUI.depth = previousDepth;
+    }
+
+    private void ApplyCanvasVisibility()
+    {
+        if (canvas == null)
+        {
+            return;
+        }
+
+        canvas.gameObject.SetActive(true);
+        canvas.enabled = !showImmediateModeFallback;
+
+        if (iconRoot != null)
+        {
+            iconRoot.gameObject.SetActive(!showImmediateModeFallback);
+        }
+    }
+
+    private void DrawFallbackIcon()
+    {
+        float scale = Mathf.Clamp(Screen.height / 1080f, 0.72f, 1f);
+        float width = 64f * scale;
+        float height = 40f * scale;
+        float iconX = Mathf.Clamp((Screen.width * 0.5f) - 420f, 18f, Screen.width - width - 18f);
+        Rect iconRect = new Rect(iconX, 70f * scale, width, height);
+
+        GUI.color = new Color(0.08f, 0.1f, 0.13f, 0.92f);
+        GUI.DrawTexture(iconRect, Texture2D.whiteTexture);
+
+        GUIStyle iconStyle = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = Mathf.RoundToInt(17f * scale),
+            fontStyle = FontStyle.Bold
+        };
+        iconStyle.normal.textColor = Color.white;
+        GUI.color = Color.white;
+        GUI.Label(iconRect, "Bag", iconStyle);
+
+        if (inventoryManager != null && inventoryManager.HasUnreadItems())
+        {
+            float dotSize = 11f * scale;
+            GUI.color = Color.red;
+            GUI.DrawTexture(new Rect(iconRect.xMax - dotSize - 3f, iconRect.y + 3f, dotSize, dotSize), Texture2D.whiteTexture);
+        }
+    }
+
+    private void DrawFallbackPanel()
+    {
+        float panelWidth = Mathf.Min(260f, Screen.width * 0.34f);
+        float panelHeight = Mathf.Min(240f, Screen.height * 0.45f);
+        panelWidth = Mathf.Max(220f, panelWidth);
+        panelHeight = Mathf.Max(190f, panelHeight);
+
+        Rect panelRect = new Rect((Screen.width - panelWidth) * 0.5f, (Screen.height - panelHeight) * 0.5f, panelWidth, panelHeight);
+        GUI.color = new Color(0.06f, 0.07f, 0.08f, 0.96f);
+        GUI.DrawTexture(panelRect, Texture2D.whiteTexture);
+
+        GUIStyle titleStyle = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.068f), 13, 16),
+            fontStyle = FontStyle.Bold
+        };
+        titleStyle.normal.textColor = Color.white;
+        GUI.color = Color.white;
+        GUI.Label(new Rect(panelRect.x + 12f, panelRect.y + 10f, panelRect.width - 24f, 30f), "Backpack", titleStyle);
+
+        List<InventoryItem> items = inventoryManager != null ? inventoryManager.GetItems() : new List<InventoryItem>();
+        if (items.Count == 0)
+        {
+            GUIStyle emptyStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.05f), 11, 13),
+                wordWrap = true
+            };
+            emptyStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(panelRect.x + 18f, panelRect.y + 62f, panelRect.width - 36f, panelRect.height - 112f), "No notes collected.", emptyStyle);
+            DrawFallbackCloseHint(panelRect);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(selectedItemId) || inventoryManager == null || !inventoryManager.HasItem(selectedItemId))
+        {
+            selectedItemId = items[0].itemId;
+        }
+
+        float listWidth = Mathf.Min(86f, panelRect.width * 0.34f);
+        Rect listRect = new Rect(panelRect.x + 12f, panelRect.y + 42f, listWidth, panelRect.height - 76f);
+        Rect noteRect = new Rect(listRect.xMax + 10f, listRect.y, panelRect.xMax - listRect.xMax - 22f, listRect.height);
+
+        GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.042f), 8, 10),
+            wordWrap = true
+        };
+
+        float y = listRect.y;
+        foreach (InventoryItem item in items)
+        {
+            Rect buttonRect = new Rect(listRect.x, y, listRect.width, 26f);
+            GUI.color = item.itemId == selectedItemId ? new Color(0.98f, 0.78f, 0.22f, 1f) : new Color(0.92f, 0.88f, 0.72f, 1f);
+            if (GUI.Button(buttonRect, item.itemName, buttonStyle))
+            {
+                ShowItem(item.itemId, true);
+            }
+
+            y += 31f;
+        }
+
+        InventoryItem selectedItem = FindInventoryItem(selectedItemId);
+        GUI.color = new Color(0.92f, 0.88f, 0.72f, 1f);
+        GUI.DrawTexture(noteRect, Texture2D.whiteTexture);
+
+        GUIStyle noteStyle = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.UpperLeft,
+            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.045f), 9, 11),
+            wordWrap = true
+        };
+        noteStyle.normal.textColor = Color.black;
+        GUI.color = Color.white;
+        string noteText = selectedItem != null ? $"{selectedItem.itemName}\n\n{selectedItem.content}" : string.Empty;
+        GUI.Label(new Rect(noteRect.x + 8f, noteRect.y + 8f, noteRect.width - 16f, noteRect.height - 16f), noteText, noteStyle);
+
+        DrawFallbackCloseHint(panelRect);
+    }
+
+    private void DrawFallbackCloseHint(Rect panelRect)
+    {
+        GUIStyle closeStyle = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = 10,
+            fontStyle = FontStyle.Bold
+        };
+        closeStyle.normal.textColor = Color.white;
+        GUI.color = Color.white;
+        GUI.Label(new Rect(panelRect.x + 10f, panelRect.yMax - 26f, panelRect.width - 20f, 18f), "Press Tab to close", closeStyle);
+    }
+
+    private InventoryItem FindInventoryItem(string itemId)
+    {
+        if (inventoryManager == null || string.IsNullOrWhiteSpace(itemId))
+        {
+            return null;
+        }
+
+        foreach (InventoryItem item in inventoryManager.GetItems())
+        {
+            if (item != null && item.itemId == itemId)
+            {
+                return item;
+            }
+        }
+
+        return null;
     }
 
     private TextMeshProUGUI CreateText(string value, Transform parent, string objectName, float fontSize, Color color, TextAlignmentOptions alignment)
