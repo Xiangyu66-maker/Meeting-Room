@@ -572,10 +572,10 @@ public sealed class BackpackUI : MonoBehaviour
 
     private void DrawFallbackPanel()
     {
-        float panelWidth = Mathf.Min(260f, Screen.width * 0.34f);
-        float panelHeight = Mathf.Min(240f, Screen.height * 0.45f);
-        panelWidth = Mathf.Max(220f, panelWidth);
-        panelHeight = Mathf.Max(190f, panelHeight);
+        float panelWidth = Mathf.Min(360f, Screen.width * 0.42f);
+        float panelHeight = Mathf.Min(320f, Screen.height * 0.58f);
+        panelWidth = Mathf.Max(300f, panelWidth);
+        panelHeight = Mathf.Max(260f, panelHeight);
 
         Rect panelRect = new Rect((Screen.width - panelWidth) * 0.5f, (Screen.height - panelHeight) * 0.5f, panelWidth, panelHeight);
         GUI.color = new Color(0.06f, 0.07f, 0.08f, 0.96f);
@@ -584,12 +584,12 @@ public sealed class BackpackUI : MonoBehaviour
         GUIStyle titleStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.MiddleCenter,
-            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.068f), 13, 16),
+            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.066f), 18, 22),
             fontStyle = FontStyle.Bold
         };
         titleStyle.normal.textColor = Color.white;
         GUI.color = Color.white;
-        GUI.Label(new Rect(panelRect.x + 12f, panelRect.y + 10f, panelRect.width - 24f, 30f), "Backpack", titleStyle);
+        GUI.Label(new Rect(panelRect.x + 14f, panelRect.y + 12f, panelRect.width - 28f, 34f), "Backpack", titleStyle);
 
         List<InventoryItem> items = inventoryManager != null ? inventoryManager.GetItems() : new List<InventoryItem>();
         if (items.Count == 0)
@@ -597,11 +597,11 @@ public sealed class BackpackUI : MonoBehaviour
             GUIStyle emptyStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.05f), 11, 13),
+                fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.05f), 15, 17),
                 wordWrap = true
             };
             emptyStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(panelRect.x + 18f, panelRect.y + 62f, panelRect.width - 36f, panelRect.height - 112f), "No notes collected.", emptyStyle);
+            GUI.Label(new Rect(panelRect.x + 20f, panelRect.y + 72f, panelRect.width - 40f, panelRect.height - 126f), "No notes collected.", emptyStyle);
             DrawFallbackCloseHint(panelRect);
             return;
         }
@@ -611,28 +611,28 @@ public sealed class BackpackUI : MonoBehaviour
             selectedItemId = items[0].itemId;
         }
 
-        float listWidth = Mathf.Min(86f, panelRect.width * 0.34f);
-        Rect listRect = new Rect(panelRect.x + 12f, panelRect.y + 42f, listWidth, panelRect.height - 76f);
-        Rect noteRect = new Rect(listRect.xMax + 10f, listRect.y, panelRect.xMax - listRect.xMax - 22f, listRect.height);
+        float listWidth = Mathf.Min(124f, panelRect.width * 0.34f);
+        Rect listRect = new Rect(panelRect.x + 18f, panelRect.y + 56f, listWidth, panelRect.height - 104f);
+        Rect noteRect = new Rect(listRect.xMax + 14f, listRect.y, panelRect.xMax - listRect.xMax - 32f, listRect.height);
 
         GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
         {
             alignment = TextAnchor.MiddleCenter,
-            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.042f), 8, 10),
+            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.042f), 12, 14),
             wordWrap = true
         };
 
         float y = listRect.y;
         foreach (InventoryItem item in items)
         {
-            Rect buttonRect = new Rect(listRect.x, y, listRect.width, 26f);
+            Rect buttonRect = new Rect(listRect.x, y, listRect.width, 38f);
             GUI.color = item.itemId == selectedItemId ? new Color(0.98f, 0.78f, 0.22f, 1f) : new Color(0.92f, 0.88f, 0.72f, 1f);
             if (GUI.Button(buttonRect, item.itemName, buttonStyle))
             {
                 ShowItem(item.itemId, true);
             }
 
-            y += 31f;
+            y += 44f;
         }
 
         InventoryItem selectedItem = FindInventoryItem(selectedItemId);
@@ -642,13 +642,13 @@ public sealed class BackpackUI : MonoBehaviour
         GUIStyle noteStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.UpperLeft,
-            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.045f), 9, 11),
+            fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.048f), 13, 16),
             wordWrap = true
         };
         noteStyle.normal.textColor = Color.black;
         GUI.color = Color.white;
         string noteText = selectedItem != null ? $"{selectedItem.itemName}\n\n{selectedItem.content}" : string.Empty;
-        GUI.Label(new Rect(noteRect.x + 8f, noteRect.y + 8f, noteRect.width - 16f, noteRect.height - 16f), noteText, noteStyle);
+        GUI.Label(new Rect(noteRect.x + 12f, noteRect.y + 12f, noteRect.width - 24f, noteRect.height - 24f), noteText, noteStyle);
 
         DrawFallbackCloseHint(panelRect);
     }
@@ -658,12 +658,12 @@ public sealed class BackpackUI : MonoBehaviour
         GUIStyle closeStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.MiddleCenter,
-            fontSize = 10,
+            fontSize = 13,
             fontStyle = FontStyle.Bold
         };
         closeStyle.normal.textColor = Color.white;
         GUI.color = Color.white;
-        GUI.Label(new Rect(panelRect.x + 10f, panelRect.yMax - 26f, panelRect.width - 20f, 18f), "Press Tab to close", closeStyle);
+        GUI.Label(new Rect(panelRect.x + 12f, panelRect.yMax - 34f, panelRect.width - 24f, 22f), "Press Tab to close", closeStyle);
     }
 
     private InventoryItem FindInventoryItem(string itemId)

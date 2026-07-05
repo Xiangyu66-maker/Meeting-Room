@@ -20,6 +20,16 @@ public sealed class ClueNotePickup : MonoBehaviour
         }
 
         InventoryItem item = new InventoryItem(itemId, itemName, itemType, content, false);
-        return inventory.AddItem(item);
+        bool added = inventory.AddItem(item);
+        if (added)
+        {
+            GameResultUI notificationUI = GameResultUI.GetOrCreate();
+            if (notificationUI != null)
+            {
+                notificationUI.ShowClueFound();
+            }
+        }
+
+        return added;
     }
 }

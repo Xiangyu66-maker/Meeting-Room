@@ -8,19 +8,86 @@ public sealed class GameResultUI : MonoBehaviour
 {
     private const string SuccessMessage = "Game Success! You escaped the meeting room.";
     private const string FailureMessage = "Game Failed! Time limit exceeded.";
+    private const string ClueFoundMessage = "Clue Found! Note added to backpack.";
 
     [SerializeField] private bool useTextMeshProWhenAvailable = true;
+    [SerializeField] private float holdSeconds = 2f;
+    [SerializeField] private float fadeSeconds = 1f;
 
     private GameObject resultRoot;
+    private CanvasGroup canvasGroup;
     private Component tmpText;
     private Text uiText;
     private string currentMessage;
-    private bool showImmediateModeFallback;
+    private float visibleTimer;
+    private bool isShowing;
+
+    public static GameResultUI Instance { get; private set; }
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Duplicate GameResultUI found. Disabling duplicate.", this);
+            enabled = false;
+            return;
+        }
+
+        Instance = this;
         EnsureUI();
         Hide();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
+    private void Update()
+    {
+        if (!isShowing)
+        {
+            return;
+        }
+
+        visibleTimer += Time.unscaledDeltaTime;
+        float fadeStart = Mathf.Max(0f, holdSeconds);
+        float fadeLength = Mathf.Max(0.01f, fadeSeconds);
+
+        if (visibleTimer <= fadeStart)
+        {
+            SetAlpha(1f);
+            return;
+        }
+
+        float fadeProgress = Mathf.Clamp01((visibleTimer - fadeStart) / fadeLength);
+        SetAlpha(1f - fadeProgress);
+
+        if (fadeProgress >= 1f)
+        {
+            Hide();
+        }
+    }
+
+    public static GameResultUI GetOrCreate()
+    {
+        if (Instance != null)
+        {
+            return Instance;
+        }
+
+        GameResultUI existing = FindGameResultUI();
+        if (existing != null)
+        {
+            Instance = existing;
+            return existing;
+        }
+
+        GameObject uiObject = new GameObject("Game Result UI");
+        return uiObject.AddComponent<GameResultUI>();
     }
 
     public void ShowSuccess()
@@ -33,12 +100,19 @@ public sealed class GameResultUI : MonoBehaviour
         ShowMessage(FailureMessage);
     }
 
+    public void ShowClueFound()
+    {
+        ShowMessage(ClueFoundMessage);
+    }
+
     public void ShowMessage(string message)
     {
         EnsureUI();
         SetText(message);
         currentMessage = message;
-        showImmediateModeFallback = true;
+        visibleTimer = 0f;
+        isShowing = true;
+        SetAlpha(1f);
         resultRoot.SetActive(true);
         Debug.Log($"Game result prompt shown: {message}", this);
     }
@@ -48,40 +122,16 @@ public sealed class GameResultUI : MonoBehaviour
         EnsureUI();
         resultRoot.SetActive(false);
         currentMessage = string.Empty;
-        showImmediateModeFallback = false;
-    }
-
-    private void OnGUI()
-    {
-        if (!showImmediateModeFallback || string.IsNullOrEmpty(currentMessage))
-        {
-            return;
-        }
-
-        int previousDepth = GUI.depth;
-        GUI.depth = -1000;
-
-        GUIStyle boxStyle = new GUIStyle(GUI.skin.box)
-        {
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = Mathf.Max(24, Mathf.RoundToInt(Screen.height * 0.045f)),
-            fontStyle = FontStyle.Bold,
-            wordWrap = true
-        };
-        boxStyle.normal.textColor = Color.white;
-
-        float width = Mathf.Min(Screen.width * 0.82f, 980f);
-        float height = Mathf.Min(Screen.height * 0.24f, 190f);
-        Rect rect = new Rect((Screen.width - width) * 0.5f, (Screen.height - height) * 0.5f, width, height);
-        GUI.Box(rect, currentMessage, boxStyle);
-
-        GUI.depth = previousDepth;
+        visibleTimer = 0f;
+        isShowing = false;
+        SetAlpha(0f);
     }
 
     private void EnsureUI()
     {
         if (resultRoot != null)
         {
+            EnsureCanvasGroup();
             return;
         }
 
@@ -98,6 +148,7 @@ public sealed class GameResultUI : MonoBehaviour
 
         resultRoot = new GameObject("Game Result Panel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         resultRoot.transform.SetParent(canvasObject.transform, false);
+        canvasGroup = resultRoot.AddComponent<CanvasGroup>();
 
         RectTransform panelRect = resultRoot.GetComponent<RectTransform>();
         panelRect.anchorMin = Vector2.zero;
@@ -132,6 +183,28 @@ public sealed class GameResultUI : MonoBehaviour
             Outline outline = textObject.AddComponent<Outline>();
             outline.effectColor = new Color(0f, 0f, 0f, 0.9f);
             outline.effectDistance = new Vector2(3f, -3f);
+        }
+    }
+
+    private void EnsureCanvasGroup()
+    {
+        if (resultRoot == null || canvasGroup != null)
+        {
+            return;
+        }
+
+        canvasGroup = resultRoot.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = resultRoot.AddComponent<CanvasGroup>();
+        }
+    }
+
+    private void SetAlpha(float alpha)
+    {
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = Mathf.Clamp01(alpha);
         }
     }
 
@@ -200,5 +273,14 @@ public sealed class GameResultUI : MonoBehaviour
         {
             property.SetValue(component, value, null);
         }
+    }
+
+    private static GameResultUI FindGameResultUI()
+    {
+#if UNITY_2023_1_OR_NEWER
+        return FindFirstObjectByType<GameResultUI>();
+#else
+        return FindObjectOfType<GameResultUI>();
+#endif
     }
 }

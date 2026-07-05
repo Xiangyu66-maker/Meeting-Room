@@ -63,6 +63,29 @@ public sealed class OpenableCabinet : MonoBehaviour
     public void Toggle()
     {
         targetOpen = !targetOpen;
+        if (targetOpen)
+        {
+            TryCollectAttachedClueNote();
+        }
+    }
+
+    private void TryCollectAttachedClueNote()
+    {
+        ClueNotePickup pickup = GetComponent<ClueNotePickup>();
+        if (pickup == null)
+        {
+            pickup = GetComponentInParent<ClueNotePickup>();
+        }
+
+        if (pickup == null)
+        {
+            pickup = GetComponentInChildren<ClueNotePickup>();
+        }
+
+        if (pickup != null)
+        {
+            pickup.TryCollect();
+        }
     }
 
     private bool IsPlayerAimingAtCabinet()
