@@ -13,6 +13,7 @@ public sealed class DoorController : MonoBehaviour
     private Vector3 openLocalPosition;
     private bool isOpening;
     private bool loggedVictory;
+    private bool notifiedGameState;
 
     private void Awake()
     {
@@ -52,5 +53,11 @@ public sealed class DoorController : MonoBehaviour
         isUnlocked = true;
         isOpening = true;
         Debug.Log("Door unlocked. Opening door.", this);
+
+        if (!notifiedGameState)
+        {
+            notifiedGameState = true;
+            FindObjectOfType<GameStateManager>()?.NotifyDoorUnlocked();
+        }
     }
 }

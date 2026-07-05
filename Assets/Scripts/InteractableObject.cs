@@ -64,13 +64,20 @@ public sealed class InteractableObject : MonoBehaviour
             case "seat_card_04":
                 // Trigger hook: seat cards observed.
                 Debug.Log($"Seat card observed: {objectId}", this);
+                NotifySeatCardGuidanceSystem(objectId);
                 break;
 
             case "locked_door_01":
                 // Trigger hook: door inspected.
                 Debug.Log("Locked door inspected.", this);
                 break;
+
+            case "cabinet_01":
+                Debug.Log("Cabinet interacted. Checking for clue note pickup.", this);
+                break;
         }
+
+        TryCollectAttachedClueNote();
     }
 
     private string GetDescription()
@@ -133,5 +140,64 @@ public sealed class InteractableObject : MonoBehaviour
     private void Reset()
     {
         identity = GetComponent<ObjectIdentity>();
+    }
+
+    private void TryCollectAttachedClueNote()
+    {
+        ClueNotePickup pickup = GetComponent<ClueNotePickup>();
+        if (pickup == null)
+        {
+            pickup = GetComponentInParent<ClueNotePickup>();
+        }
+
+        if (pickup == null)
+        {
+            pickup = GetComponentInChildren<ClueNotePickup>();
+        }
+
+        if (pickup != null)
+        {
+            pickup.TryCollect();
+        }
+    }
+
+    private static void NotifySeatCardGuidanceSystem(string objectId)
+    {
+        SeatCardGuidanceManager manager = FindSeatCardGuidanceManager();
+        SeatCardInspectionTracker tracker = FindSeatCardInspectionTracker();
+
+        if (manager == null || tracker == null)
+        {
+            manager = SeatCardGuidanceSetupHelper.SetupGuidanceSystem();
+            tracker = FindSeatCardInspectionTracker();
+        }
+
+        if (tracker != null)
+        {
+            tracker.MarkSeatCardInspected(objectId);
+        }
+
+        if (manager != null)
+        {
+            manager.NotifySeatCardInspected(objectId);
+        }
+    }
+
+    private static SeatCardGuidanceManager FindSeatCardGuidanceManager()
+    {
+#if UNITY_2023_1_OR_NEWER
+        return FindFirstObjectByType<SeatCardGuidanceManager>();
+#else
+        return FindObjectOfType<SeatCardGuidanceManager>();
+#endif
+    }
+
+    private static SeatCardInspectionTracker FindSeatCardInspectionTracker()
+    {
+#if UNITY_2023_1_OR_NEWER
+        return FindFirstObjectByType<SeatCardInspectionTracker>();
+#else
+        return FindObjectOfType<SeatCardInspectionTracker>();
+#endif
     }
 }
