@@ -352,6 +352,7 @@ public sealed class BackpackUI : MonoBehaviour
         noteTextRect.offsetMin = new Vector2(10f, 10f);
         noteTextRect.offsetMax = new Vector2(-10f, -10f);
         noteDisplayText.textWrappingMode = TextWrappingModes.Normal;
+        noteDisplayText.richText = true;
         noteDisplayText.enableAutoSizing = true;
         noteDisplayText.fontSizeMin = 9f;
         noteDisplayText.fontSizeMax = 15f;
@@ -364,7 +365,7 @@ public sealed class BackpackUI : MonoBehaviour
         emptyRect.anchoredPosition = new Vector2(0f, 0f);
         emptyRect.sizeDelta = new Vector2(-36f, 38f);
 
-        TextMeshProUGUI closeText = CreateText("Press Tab to close", panelRect, "Backpack Close Text", 13f, Color.white, TextAlignmentOptions.Center);
+        TextMeshProUGUI closeText = CreateText("Press E to switch clue | Tab to close", panelRect, "Backpack Close Text", 13f, Color.white, TextAlignmentOptions.Center);
         RectTransform closeRect = closeText.rectTransform;
         closeRect.anchorMin = new Vector2(0f, 0f);
         closeRect.anchorMax = new Vector2(1f, 0f);
@@ -473,6 +474,45 @@ public sealed class BackpackUI : MonoBehaviour
             inventoryManager.MarkItemRead(item.itemId);
             UpdateNotificationDot();
         }
+    }
+
+    public bool SelectNextItem()
+    {
+        EnsureUI();
+        ResolveInventory();
+
+        if (inventoryManager == null)
+        {
+            return false;
+        }
+
+        List<InventoryItem> items = inventoryManager.GetItems();
+        if (items.Count == 0)
+        {
+            return false;
+        }
+
+        int currentIndex = -1;
+        for (int i = 0; i < items.Count; i++)
+        {
+            if (items[i] != null && items[i].itemId == selectedItemId)
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        int nextIndex = (currentIndex + 1) % items.Count;
+        InventoryItem nextItem = items[nextIndex];
+        if (nextItem == null)
+        {
+            return false;
+        }
+
+        ShowItem(nextItem.itemId, true);
+        RefreshPanel();
+        Debug.Log($"Backpack switched clue: {nextItem.itemName}", this);
+        return true;
     }
 
     private void MarkVisibleNotesRead()
@@ -643,6 +683,7 @@ public sealed class BackpackUI : MonoBehaviour
         {
             alignment = TextAnchor.UpperLeft,
             fontSize = Mathf.Clamp(Mathf.RoundToInt(panelHeight * 0.048f), 13, 16),
+            richText = true,
             wordWrap = true
         };
         noteStyle.normal.textColor = Color.black;
@@ -663,7 +704,7 @@ public sealed class BackpackUI : MonoBehaviour
         };
         closeStyle.normal.textColor = Color.white;
         GUI.color = Color.white;
-        GUI.Label(new Rect(panelRect.x + 12f, panelRect.yMax - 34f, panelRect.width - 24f, 22f), "Press Tab to close", closeStyle);
+        GUI.Label(new Rect(panelRect.x + 12f, panelRect.yMax - 34f, panelRect.width - 24f, 22f), "Press E to switch clue | Tab to close", closeStyle);
     }
 
     private InventoryItem FindInventoryItem(string itemId)
@@ -692,6 +733,7 @@ public sealed class BackpackUI : MonoBehaviour
         text.fontSize = fontSize;
         text.color = color;
         text.alignment = alignment;
+        text.richText = true;
         text.textWrappingMode = TextWrappingModes.Normal;
         return text;
     }

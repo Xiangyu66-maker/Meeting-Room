@@ -10,6 +10,14 @@ public sealed class ClueNotePickup : MonoBehaviour
     [TextArea]
     [SerializeField] private string content = "The first digit of the password is 3.";
 
+    public void Configure(string newItemId, string newItemName, string newItemType, string newContent)
+    {
+        itemId = newItemId;
+        itemName = newItemName;
+        itemType = newItemType;
+        content = newContent;
+    }
+
     public bool TryCollect()
     {
         InventoryManager inventory = InventoryManager.GetOrCreate();
