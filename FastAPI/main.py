@@ -14,9 +14,6 @@ MODEL_NAME = os.getenv("KKRICH_MODEL", "gpt-5.5")
 BASE_URL = os.getenv("KKRICH_BASE_URL", "https://api.kkrich.ltd/v1")
 VLM_MODEL_NAME = os.getenv("KKRICH_VLM_MODEL", "gpt-5.5")
 
-if not API_KEY:
-    raise RuntimeError("KKRICH_API_KEY is missing. Please set it in the .env file.")
-
 client = OpenAI(
     api_key=API_KEY,
     base_url=BASE_URL
@@ -25,9 +22,10 @@ client = OpenAI(
 app = FastAPI(
     title="Unity AI Guidance Backend",
     description="FastAPI backend for AI Agent guidance in an immersive Unity puzzle game.",
-    version="0.2"
+    version="0.3"
 )
 
+session_memory = {}
 
 class Position(BaseModel):
     x: float
@@ -58,6 +56,55 @@ class GuideResponse(BaseModel):
     status: str
     vision_text: Optional[str] = None
     latency_ms: Optional[int] = None
+
+
+def get_stage_from_task(current_task: str) -> str:
+    if not current_task:
+        return "unknown"
+
+    task_lower = current_task.lower()
+
+    if "current_stage:" in task_lower:
+        try:
+            return task_lower.split("current_stage:")[1].splitlines()[0].strip()
+        except Exception:
+            return "unknown"
+
+    return "unknown"
+
+
+def get_memory(session_id: str) -> dict:
+    """
+    Get memory for the current demo player.
+    If memory does not exist, initialize it.
+    """
+    if session_id not in session_memory:
+        session_memory[session_id] = {
+            "last_stage": "unknown",
+            "hint_count": 0,
+            "recent_instructions": []
+        }
+
+    return session_memory[session_id]
+
+
+def update_memory(
+    session_id: str,
+    current_stage: str,
+    instruction: str
+) -> None:
+
+    memory = get_memory(session_id)
+
+    if memory["last_stage"] != current_stage:
+        memory["last_stage"] = current_stage
+        memory["hint_count"] = 0
+        memory["recent_instructions"] = []
+    else:
+        memory["hint_count"] += 1
+
+    memory["recent_instructions"].append(instruction)
+    memory["recent_instructions"] = memory["recent_instructions"][-2:]
 
 
 def build_objects_text(objects: List[SceneObject]) -> str:
@@ -172,13 +219,24 @@ Recommended target visibility:
 def build_guidance_prompt(
     request: GuideRequest,
     objects_text: str,
-    vision_text: str
+    vision_text: str,
+    memory: dict
 ) -> str:
     current_task = (
         request.current_task.strip()
         if request.current_task
         else "Explore the room and look for useful clues."
     )
+
+    recent_instructions = memory.get("recent_instructions", [])
+
+    recent_instructions_text = (
+        "\n".join([f"- {item}" for item in recent_instructions])
+        if recent_instructions
+        else "No recent AI instructions."
+    )
+
+    hint_count = memory.get("hint_count", 0)
 
     return f"""
 You are an in-game AI assistant inside a Unity 3D immersive puzzle game.
@@ -190,6 +248,7 @@ Your job is to give ONE natural game-style guidance sentence based on:
 - Unity structured objects
 - visual information from the camera image
 - object states
+- short-term memory from previous AI instructions
 
 ---
 
@@ -204,6 +263,7 @@ Information priority:
 2. Unity structured objects are the ground truth for known game objects.
 3. Visual analysis is used to add scene context, such as visible clues, obstacles, objects, and interactable items.
 4. If Unity data and visual analysis conflict, trust Unity object state first.
+5. Short-term memory is used only to avoid repeated hints and adjust hint strength.
 
 ---
 
@@ -235,6 +295,16 @@ Hint strength policy:
 8. Do not reveal the final password directly.
 9. Do not repeat the exact same wording as a previous hint if previous guidance is available.
 
+Short-term memory rules:
+1. Use recent AI instructions to avoid repeating the same guidance.
+2. Do not repeat the same wording as the previous two instructions.
+3. If hint_count is 0, give a gentle and indirect hint.
+4. If hint_count is 1, give a clearer hint.
+5. If hint_count is 2 or more, give a stronger and more direct hint.
+6. If the player remains in the same stage, gradually increase specificity.
+7. If the previous instruction already mentioned the same target, do not repeat it exactly; add a more specific clue or next interaction.
+8. Do not reveal the final password directly.
+
 ---
 
 Player position:
@@ -242,6 +312,13 @@ Player position:
 
 Current task:
 {current_task}
+
+Short-term memory:
+Hint count in current stage:
+{hint_count}
+
+Recent AI instructions:
+{recent_instructions_text}
 
 Unity structured objects:
 {objects_text}
@@ -269,25 +346,17 @@ def home():
         "vlm_model": VLM_MODEL_NAME,
         "base_url": BASE_URL
     }
-
-
-@app.get("/health")
-def health_check():
-    return {
-        "status": "ok",
-        "message": "Unity AI guidance backend is running.",
-        "model": MODEL_NAME,
-        "vlm_model": VLM_MODEL_NAME
-    }
-
-
 @app.post("/guide", response_model=GuideResponse)
 def generate_guidance(request: GuideRequest):
     start_time = time.time()
+    session_id = "default_player"
+
+    current_stage = get_stage_from_task(request.current_task)
+    memory = get_memory(session_id)
 
     objects_text = build_objects_text(request.objects)
     vision_text = analyze_image_with_vlm(request.image_base64, objects_text)
-    prompt = build_guidance_prompt(request, objects_text, vision_text)
+    prompt = build_guidance_prompt(request, objects_text, vision_text, memory)
 
     try:
         response = client.chat.completions.create(
@@ -298,6 +367,7 @@ def generate_guidance(request: GuideRequest):
                     "content": (
                         "You are a Unity 3D in-game assistant. "
                         "Help the player understand the scene, notice clues, "
+                        "avoid repeating previous hints, "
                         "and decide the next useful interaction."
                     )
                 },
@@ -311,6 +381,12 @@ def generate_guidance(request: GuideRequest):
 
         instruction = response.choices[0].message.content.strip()
         latency_ms = int((time.time() - start_time) * 1000)
+
+        update_memory(
+            session_id=session_id,
+            current_stage=current_stage,
+            instruction=instruction
+        )
 
         return GuideResponse(
             instruction=instruction,
