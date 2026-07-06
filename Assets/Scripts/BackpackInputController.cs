@@ -6,6 +6,7 @@ public sealed class BackpackInputController : MonoBehaviour
 {
     [SerializeField] private BackpackUI backpackUI;
     [SerializeField] private KeyCode toggleKey = KeyCode.Tab;
+    [SerializeField] private KeyCode nextItemKey = KeyCode.E;
 
     private void Awake()
     {
@@ -14,7 +15,10 @@ public sealed class BackpackInputController : MonoBehaviour
 
     private void Update()
     {
-        if (!Input.GetKeyDown(toggleKey))
+        bool togglePressed = Input.GetKeyDown(toggleKey);
+        bool nextItemPressed = Input.GetKeyDown(nextItemKey);
+
+        if (!togglePressed && !nextItemPressed)
         {
             return;
         }
@@ -31,15 +35,25 @@ public sealed class BackpackInputController : MonoBehaviour
             return;
         }
 
-        if (backpackUI.IsOpen)
+        if (togglePressed)
         {
-            backpackUI.CloseBackpack();
-            Debug.Log("Backpack closed.", this);
+            if (backpackUI.IsOpen)
+            {
+                backpackUI.CloseBackpack();
+                Debug.Log("Backpack closed.", this);
+            }
+            else
+            {
+                backpackUI.OpenBackpack();
+                Debug.Log("Backpack opened.", this);
+            }
+
+            return;
         }
-        else
+
+        if (nextItemPressed && backpackUI.IsOpen)
         {
-            backpackUI.OpenBackpack();
-            Debug.Log("Backpack opened.", this);
+            backpackUI.SelectNextItem();
         }
     }
 

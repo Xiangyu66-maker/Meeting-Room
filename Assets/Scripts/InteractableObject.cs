@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 [AddComponentMenu("Conference Room/Interactable Object")]
 public sealed class InteractableObject : MonoBehaviour
 {
+    public static event Action<string, InteractableObject> Interacted;
+
     [SerializeField] private ObjectIdentity identity;
     [TextArea]
     [SerializeField] private string fallbackDescription;
@@ -23,11 +26,22 @@ public sealed class InteractableObject : MonoBehaviour
 
     public string ObjectId => Identity != null ? Identity.ObjectId : gameObject.name;
 
+    public static void NotifyExternalInteraction(string objectId, InteractableObject source = null)
+    {
+        if (string.IsNullOrWhiteSpace(objectId))
+        {
+            return;
+        }
+
+        Interacted?.Invoke(objectId, source);
+    }
+
     public void Interact()
     {
         string objectId = ObjectId;
         string description = GetDescription();
         Debug.Log($"Interacted with: {objectId} | {description}", this);
+        NotifyExternalInteraction(objectId, this);
 
         switch (objectId)
         {

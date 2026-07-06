@@ -19,7 +19,7 @@ public sealed class FirstPersonInteractor : MonoBehaviour
 
     private void Update()
     {
-        if (KeypadController.HasActiveInput)
+        if (KeypadController.HasActiveInput || IsBackpackOpen())
         {
             currentTarget = null;
             return;
@@ -88,12 +88,18 @@ public sealed class FirstPersonInteractor : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!showDebugPrompt || currentTarget == null || KeypadController.HasActiveInput)
+        if (!showDebugPrompt || currentTarget == null || KeypadController.HasActiveInput || IsBackpackOpen())
         {
             return;
         }
 
         // TODO: Replace OnGUI prompt with project UI once the guidance UI layer exists.
         GUI.Label(new Rect((Screen.width - 180f) * 0.5f, Screen.height - 72f, 180f, 28f), "Press E to interact");
+    }
+
+    private static bool IsBackpackOpen()
+    {
+        BackpackUI backpack = BackpackUI.Instance;
+        return backpack != null && backpack.IsOpen;
     }
 }
