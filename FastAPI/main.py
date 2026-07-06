@@ -14,6 +14,9 @@ MODEL_NAME = os.getenv("KKRICH_MODEL", "gpt-5.5")
 BASE_URL = os.getenv("KKRICH_BASE_URL", "https://api.kkrich.ltd/v1")
 VLM_MODEL_NAME = os.getenv("KKRICH_VLM_MODEL", "gpt-5.5")
 
+if not API_KEY:
+    raise RuntimeError("KKRICH_API_KEY is missing. Please set it in the .env file.")
+
 client = OpenAI(
     api_key=API_KEY,
     base_url=BASE_URL
@@ -112,11 +115,15 @@ Focus only on:
 5. Relationships between important objects
 6. Whether the image matches Unity object states
 7. Possible clues related to the current task
+8. Whether the Unity recommended target object is visible in the current camera image
 
 Important rules:
 - Unity object state is the ground truth.
 - Do not override Unity state based only on the image.
+- Do not claim an object is visible unless it is clearly visible in the image.
+- If the recommended target is not visible, say it is not visible or uncertain.
 - Do not solve the puzzle directly.
+- Do not give the final player instruction.
 - Do not give movement directions.
 - Do not describe irrelevant background details.
 - Keep the answer short and factual.
@@ -137,6 +144,10 @@ Task-related clues:
 
 Unity state alignment:
 - ...
+
+Recommended target visibility:
+- target_object_id: visible / not visible / uncertain
+- evidence: ...
 """
                         },
                         {
@@ -205,6 +216,24 @@ Task guidance rules:
 6. Do not give exact puzzle solutions unless the task is already completed.
 7. Do not output movement directions unless clearly necessary.
 8. If Unity provides a recommended target or current stage in current_task, follow that diagnosis.
+
+Recommended target visibility rules:
+1. If the visual analysis says the recommended target is visible, suggest inspecting or interacting with that visible target directly.
+2. If the visual analysis says the recommended target is not visible, do not claim the target is visible or in front of the player.
+3. If the recommended target is not visible, tell the player to look for that target or check the related area.
+4. If the recommended target visibility is uncertain, give a cautious hint and mention the likely area instead of a precise visible object.
+5. If Unity state and visual analysis conflict, trust Unity state as the task ground truth, but phrase the instruction carefully.
+
+Hint strength policy:
+1. Use a gentle hint when the player has just entered the current stage.
+2. Use a normal hint when the player is progressing normally.
+3. Use a stronger hint when time_in_current_stage_seconds is high or the player appears stuck.
+4. Use a correction hint when failed_keypad_attempts is greater than 0.
+5. A gentle hint should mention the relevant area or clue type without directly naming every answer.
+6. A stronger hint may mention the recommended target object more directly.
+7. A correction hint should help the player recover from a wrong action, such as re-checking the seat-card clues after a wrong keypad attempt.
+8. Do not reveal the final password directly.
+9. Do not repeat the exact same wording as a previous hint if previous guidance is available.
 
 ---
 
