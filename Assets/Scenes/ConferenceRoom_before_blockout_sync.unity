@@ -119,6 +119,25 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &3389363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 357638901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &8389489
 GameObject:
   m_ObjectHideFlags: 0
@@ -3095,6 +3114,7 @@ GameObject:
   - component: {fileID: 160433998}
   - component: {fileID: 7300000033}
   - component: {fileID: 7900000014}
+  - component: {fileID: 1269459194}
   m_Layer: 0
   m_Name: Left Back Floor Plant
   m_TagString: Untagged
@@ -4718,6 +4738,7 @@ GameObject:
   - component: {fileID: 235560785}
   - component: {fileID: 235560784}
   - component: {fileID: 235560783}
+  - component: {fileID: 235560786}
   m_Layer: 0
   m_Name: Pen Right
   m_TagString: Untagged
@@ -4818,6 +4839,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 235560781}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &235560786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 235560781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &236169217
 GameObject:
   m_ObjectHideFlags: 0
@@ -7508,6 +7548,7 @@ GameObject:
   - component: {fileID: 357638903}
   - component: {fileID: 7300000030}
   - component: {fileID: 7900000011}
+  - component: {fileID: 3389363}
   m_Layer: 0
   m_Name: Open Notebook Left
   m_TagString: Untagged
@@ -8781,6 +8822,7 @@ GameObject:
   - component: {fileID: 450274125}
   - component: {fileID: 7300000029}
   - component: {fileID: 7900000007}
+  - component: {fileID: 609173187}
   m_Layer: 0
   m_Name: Presentation Remote
   m_TagString: Untagged
@@ -10886,6 +10928,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 602041156}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &609173187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450274123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &620686827
 GameObject:
   m_ObjectHideFlags: 0
@@ -13093,6 +13154,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 725937463}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &726202348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295910833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &727863895
 GameObject:
   m_ObjectHideFlags: 0
@@ -13494,6 +13574,7 @@ MonoBehaviour:
   interactionCamera: {fileID: 0}
   interactionRange: 3
   interactKey: 101
+  grabKey: 102
   showDebugPrompt: 1
 --- !u!1 &764006865
 GameObject:
@@ -15941,6 +16022,7 @@ GameObject:
   - component: {fileID: 882623610}
   - component: {fileID: 7300000035}
   - component: {fileID: 7900000016}
+  - component: {fileID: 7900000019}
   m_Layer: 0
   m_Name: Entry Side Floor Plant
   m_TagString: Untagged
@@ -16572,6 +16654,7 @@ GameObject:
   - component: {fileID: 942075664}
   - component: {fileID: 7300000036}
   - component: {fileID: 7900000017}
+  - component: {fileID: 7900000018}
   m_Layer: 0
   m_Name: Small Table Plant
   m_TagString: Untagged
@@ -20184,6 +20267,7 @@ GameObject:
   - component: {fileID: 1114192740}
   - component: {fileID: 1114192739}
   - component: {fileID: 1114192738}
+  - component: {fileID: 1114192741}
   m_Layer: 0
   m_Name: Pen Left
   m_TagString: Untagged
@@ -20284,6 +20368,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1114192736}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1114192741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114192736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &1117866293
 GameObject:
   m_ObjectHideFlags: 0
@@ -21090,6 +21193,7 @@ GameObject:
   - component: {fileID: 1157177703}
   - component: {fileID: 7300000034}
   - component: {fileID: 7900000015}
+  - component: {fileID: 7900000020}
   m_Layer: 0
   m_Name: Right Back Floor Plant
   m_TagString: Untagged
@@ -23827,6 +23931,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268041581}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1269459194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160433997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1001 &1281166217
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24355,6 +24478,7 @@ GameObject:
   - component: {fileID: 1295910835}
   - component: {fileID: 7300000031}
   - component: {fileID: 7900000012}
+  - component: {fileID: 726202348}
   m_Layer: 0
   m_Name: Open Notebook Right
   m_TagString: Untagged
@@ -32651,6 +32775,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1795089163}
+  - component: {fileID: 1795089164}
   m_Layer: 0
   m_Name: Mug Right
   m_TagString: Untagged
@@ -32676,6 +32801,25 @@ Transform:
   - {fileID: 1299706071}
   m_Father: {fileID: 8389490}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1795089164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795089162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1001 &1799291648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34514,6 +34658,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1897008643}
+  - component: {fileID: 1897008644}
   m_Layer: 0
   m_Name: Mug Left
   m_TagString: Untagged
@@ -34539,6 +34684,25 @@ Transform:
   - {fileID: 54463309}
   m_Father: {fileID: 8389490}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1897008644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897008642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &1901062602
 GameObject:
   m_ObjectHideFlags: 0
@@ -45192,6 +45356,63 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   identity: {fileID: 7300000036}
   fallbackDescription: 
+--- !u!114 &7900000018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942075663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.2
+  drawDebugRays: 1
+--- !u!114 &7900000019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882623609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
+--- !u!114 &7900000020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157177702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!114 &7900000100
 MonoBehaviour:
   m_ObjectHideFlags: 0
