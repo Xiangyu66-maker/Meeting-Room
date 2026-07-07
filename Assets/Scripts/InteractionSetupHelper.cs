@@ -10,6 +10,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     [SerializeField] private bool runInEditMode = true;
     [SerializeField] private bool addFirstPersonInteractorToCamera = true;
 
+    // 原有重要ID集合（用于添加 InteractableObject 和 Collider）
     private static readonly HashSet<string> ImportantObjectIds = new HashSet<string>
     {
         "locked_door_01",
@@ -30,6 +31,19 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         "plant_02",
         "plant_03",
         "plant_04",
+    };
+
+    // 可拾取物体的ID集合（这些物体将被添加 GrabbableObject）
+    private static readonly HashSet<string> GrabbableObjectIds = new HashSet<string>
+    {
+        "remote_01",
+        "document_01",
+        "document_02",
+        "plant_01",
+        "plant_02",
+        "plant_03",
+        "plant_04",
+        // 可根据需要扩展，例如 "whiteboard_01" 如果希望可拿起
     };
 
     private static readonly Dictionary<string, Metadata> DefaultMetadata = new Dictionary<string, Metadata>
@@ -54,6 +68,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         { "plant_04", new Metadata("distractor", "Small table plant distractor.") },
     };
 
+    // TextMesh深度文字材质缓存
     private static readonly Dictionary<Font, Material> DepthTextMaterials = new Dictionary<Font, Material>();
 
     private void Awake()
@@ -83,18 +98,16 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     {
         ObjectIdentity[] identities = FindObjectsOfType<ObjectIdentity>();
         Dictionary<string, ObjectIdentity> byId = new Dictionary<string, ObjectIdentity>();
-
         foreach (ObjectIdentity identity in identities)
         {
             if (identity == null || string.IsNullOrWhiteSpace(identity.ObjectId))
-            {
                 continue;
-            }
 
             byId[identity.ObjectId] = identity;
             ApplyMetadata(identity);
             EnsureInteractable(identity);
             EnsureColliderWhenSafe(identity);
+            EnsureGrabbable(identity);
         }
 
         DoorController door = EnsureDoorController(byId);
@@ -120,9 +133,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     private static void EnsureInteractable(ObjectIdentity identity)
     {
         if (!ImportantObjectIds.Contains(identity.ObjectId))
-        {
             return;
-        }
 
         if (identity.GetComponent<InteractableObject>() == null)
         {
@@ -134,14 +145,10 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     private static void EnsureColliderWhenSafe(ObjectIdentity identity)
     {
         if (!ImportantObjectIds.Contains(identity.ObjectId))
-        {
             return;
-        }
 
         if (identity.GetComponent<Collider>() != null || identity.GetComponentInChildren<Collider>() != null)
-        {
             return;
-        }
 
         if (identity.GetComponent<Renderer>() == null && identity.GetComponent<MeshFilter>() == null)
         {
@@ -151,6 +158,19 @@ public sealed class InteractionSetupHelper : MonoBehaviour
 
         identity.gameObject.AddComponent<BoxCollider>();
         Debug.Log($"Added BoxCollider to {identity.ObjectId}.", identity);
+    }
+
+    // 确保可拾取物体挂载 GrabbableObject
+    private static void EnsureGrabbable(ObjectIdentity identity)
+    {
+        if (!GrabbableObjectIds.Contains(identity.ObjectId))
+            return;
+
+        if (identity.GetComponent<GrabbableObject>() == null)
+        {
+            identity.gameObject.AddComponent<GrabbableObject>();
+            Debug.Log($"Added GrabbableObject to {identity.ObjectId}.", identity);
+        }
     }
 
     private static DoorController EnsureDoorController(Dictionary<string, ObjectIdentity> byId)
@@ -167,7 +187,6 @@ public sealed class InteractionSetupHelper : MonoBehaviour
             door = doorIdentity.gameObject.AddComponent<DoorController>();
             Debug.Log("Added DoorController to locked_door_01.", doorIdentity);
         }
-
         return door;
     }
 
@@ -185,10 +204,10 @@ public sealed class InteractionSetupHelper : MonoBehaviour
             keypad = keypadIdentity.gameObject.AddComponent<KeypadController>();
             Debug.Log("Added KeypadController to keypad_01.", keypadIdentity);
         }
-
         keypad.ConfigureDoor(door);
     }
 
+    #region TextMesh 深度透明材质处理
     private static void ApplyDepthTestedTextMaterials()
     {
         Shader textShader = Shader.Find("ConferenceRoom/World Text Depth");
@@ -203,22 +222,16 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         foreach (TextMesh textMesh in textMeshes)
         {
             if (textMesh == null || textMesh.font == null)
-            {
                 continue;
-            }
 
             MeshRenderer renderer = textMesh.GetComponent<MeshRenderer>();
             if (renderer == null)
-            {
                 continue;
-            }
 
             textMesh.font.RequestCharactersInTexture(textMesh.text, textMesh.fontSize, textMesh.fontStyle);
             Material material = GetDepthTextMaterial(textMesh.font, textShader);
             if (material == null)
-            {
                 continue;
-            }
 
             renderer.sharedMaterial = material;
             updatedCount++;
@@ -242,14 +255,12 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     private static Material GetDepthTextMaterial(Font font, Shader shader)
     {
         Texture fontTexture = font.material != null ? font.material.mainTexture : null;
-
         if (DepthTextMaterials.TryGetValue(font, out Material material) && material != null && material.shader == shader)
         {
             if (fontTexture != null && material.mainTexture != fontTexture)
             {
                 material.mainTexture = fontTexture;
             }
-
             return material;
         }
 
@@ -261,11 +272,11 @@ public sealed class InteractionSetupHelper : MonoBehaviour
             color = Color.white,
             renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest,
         };
-
         material.SetFloat("_Cutoff", 0.1f);
         DepthTextMaterials[font] = material;
         return material;
     }
+    #endregion
 
     private static void EnsureFirstPersonInteractor()
     {
@@ -296,7 +307,6 @@ public sealed class InteractionSetupHelper : MonoBehaviour
             Category = category;
             Description = description;
         }
-
         public string Category { get; }
         public string Description { get; }
     }
