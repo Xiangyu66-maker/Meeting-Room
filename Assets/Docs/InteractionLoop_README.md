@@ -34,6 +34,16 @@ Correct password: `3142`
 
 When the correct password is submitted, `DoorController.UnlockDoor()` is called on `locked_door_01`, and the door slides open.
 
+## Success, Failure, And Timer
+
+`Game State Manager` is attached under `Escape Puzzle Additions`.
+
+- The game starts in `Playing`.
+- The top-center timer bar counts down from 600 seconds.
+- Enter `3142` on `keypad_01` to unlock `locked_door_01`.
+- Walk through `victory_exit_point` after the door unlocks to show `Game Success! You escaped the meeting room.`
+- If time exceeds 600 seconds, the UI shows `Game Failed! Time limit exceeded.`
+
 ## Notes
 
 This is only the first playable interaction loop. It does not implement OpenAI, Gemini, VLM diagnosis, or the full PuzzleGraphManager.

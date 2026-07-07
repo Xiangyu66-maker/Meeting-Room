@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 [AddComponentMenu("Conference Room/Interactable Object")]
 public sealed class InteractableObject : MonoBehaviour
 {
+    public static event Action<string, InteractableObject> Interacted;
+
     [SerializeField] private ObjectIdentity identity;
     [TextArea]
     [SerializeField] private string fallbackDescription;
@@ -23,11 +26,29 @@ public sealed class InteractableObject : MonoBehaviour
 
     public string ObjectId => Identity != null ? Identity.ObjectId : gameObject.name;
 
+    public static void NotifyExternalInteraction(string objectId, InteractableObject source = null)
+    {
+        if (string.IsNullOrWhiteSpace(objectId))
+        {
+            return;
+        }
+
+        Interacted?.Invoke(objectId, source);
+    }
+
     public void Interact()
     {
         string objectId = ObjectId;
         string description = GetDescription();
         Debug.Log($"Interacted with: {objectId} | {description}", this);
+<<<<<<< HEAD
+        if (GptVisionInteractionManager.Instance != null)
+{
+    GptVisionInteractionManager.Instance.AnalyzeObject(gameObject, objectId, description);
+}
+=======
+        NotifyExternalInteraction(objectId, this);
+>>>>>>> main
 
         switch (objectId)
         {
@@ -64,13 +85,20 @@ public sealed class InteractableObject : MonoBehaviour
             case "seat_card_04":
                 // Trigger hook: seat cards observed.
                 Debug.Log($"Seat card observed: {objectId}", this);
+                NotifySeatCardGuidanceSystem(objectId);
                 break;
 
             case "locked_door_01":
                 // Trigger hook: door inspected.
                 Debug.Log("Locked door inspected.", this);
                 break;
+
+            case "cabinet_01":
+                Debug.Log("Cabinet interacted. Checking for clue note pickup.", this);
+                break;
         }
+
+        TryCollectAttachedClueNote();
     }
 
     private string GetDescription()
@@ -133,5 +161,64 @@ public sealed class InteractableObject : MonoBehaviour
     private void Reset()
     {
         identity = GetComponent<ObjectIdentity>();
+    }
+
+    private void TryCollectAttachedClueNote()
+    {
+        ClueNotePickup pickup = GetComponent<ClueNotePickup>();
+        if (pickup == null)
+        {
+            pickup = GetComponentInParent<ClueNotePickup>();
+        }
+
+        if (pickup == null)
+        {
+            pickup = GetComponentInChildren<ClueNotePickup>();
+        }
+
+        if (pickup != null)
+        {
+            pickup.TryCollect();
+        }
+    }
+
+    private static void NotifySeatCardGuidanceSystem(string objectId)
+    {
+        SeatCardGuidanceManager manager = FindSeatCardGuidanceManager();
+        SeatCardInspectionTracker tracker = FindSeatCardInspectionTracker();
+
+        if (manager == null || tracker == null)
+        {
+            manager = SeatCardGuidanceSetupHelper.SetupGuidanceSystem();
+            tracker = FindSeatCardInspectionTracker();
+        }
+
+        if (tracker != null)
+        {
+            tracker.MarkSeatCardInspected(objectId);
+        }
+
+        if (manager != null)
+        {
+            manager.NotifySeatCardInspected(objectId);
+        }
+    }
+
+    private static SeatCardGuidanceManager FindSeatCardGuidanceManager()
+    {
+#if UNITY_2023_1_OR_NEWER
+        return FindFirstObjectByType<SeatCardGuidanceManager>();
+#else
+        return FindObjectOfType<SeatCardGuidanceManager>();
+#endif
+    }
+
+    private static SeatCardInspectionTracker FindSeatCardInspectionTracker()
+    {
+#if UNITY_2023_1_OR_NEWER
+        return FindFirstObjectByType<SeatCardInspectionTracker>();
+#else
+        return FindObjectOfType<SeatCardInspectionTracker>();
+#endif
     }
 }

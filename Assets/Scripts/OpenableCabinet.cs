@@ -43,9 +43,10 @@ public sealed class OpenableCabinet : MonoBehaviour
 
     private void Update()
     {
-        canInteract = IsPlayerAimingAtCabinet();
+        bool backpackOpen = IsBackpackOpen();
+        canInteract = !backpackOpen && IsPlayerAimingAtCabinet();
 
-        if (canInteract && Input.GetKeyDown(interactKey))
+        if (!backpackOpen && canInteract && Input.GetKeyDown(interactKey))
         {
             Toggle();
         }
@@ -62,7 +63,31 @@ public sealed class OpenableCabinet : MonoBehaviour
 
     public void Toggle()
     {
+        NotifyGuidanceInteraction();
         targetOpen = !targetOpen;
+        if (targetOpen)
+        {
+            TryCollectAttachedClueNote();
+        }
+    }
+
+    private void TryCollectAttachedClueNote()
+    {
+        ClueNotePickup pickup = GetComponent<ClueNotePickup>();
+        if (pickup == null)
+        {
+            pickup = GetComponentInParent<ClueNotePickup>();
+        }
+
+        if (pickup == null)
+        {
+            pickup = GetComponentInChildren<ClueNotePickup>();
+        }
+
+        if (pickup != null)
+        {
+            pickup.TryCollect();
+        }
     }
 
     private bool IsPlayerAimingAtCabinet()
@@ -124,6 +149,22 @@ public sealed class OpenableCabinet : MonoBehaviour
         }
 
         return null;
+    }
+
+    private static bool IsBackpackOpen()
+    {
+        BackpackUI backpack = BackpackUI.Instance;
+        return backpack != null && backpack.IsOpen;
+    }
+
+    private void NotifyGuidanceInteraction()
+    {
+        ObjectIdentity identity = GetComponent<ObjectIdentity>();
+        string objectId = identity != null && !string.IsNullOrWhiteSpace(identity.ObjectId)
+            ? identity.ObjectId
+            : gameObject.name;
+
+        InteractableObject.NotifyExternalInteraction(objectId, GetComponent<InteractableObject>());
     }
 
     private void OnGUI()
