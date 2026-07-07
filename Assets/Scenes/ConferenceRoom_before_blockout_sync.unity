@@ -119,6 +119,25 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &3389363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 357638901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &8389489
 GameObject:
   m_ObjectHideFlags: 0
@@ -2520,6 +2539,7 @@ GameObject:
   m_Component:
   - component: {fileID: 119337049}
   - component: {fileID: 7300000005}
+  - component: {fileID: 398693583}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -2860,65 +2880,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141885244}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &148151765
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 148151767}
-  - component: {fileID: 148151766}
-  m_Layer: 0
-  m_Name: GPT Vision Interaction Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &148151766
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 148151765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d3cbe78bddd05d42aa304e0ba9dcaec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GptVisionInteractionManager
-  provider: 0
-  openAiModel: gpt-5.4-mini
-  geminiModel: gemini-3.5-flash
-  openAiApiKeyEnvironmentVariable: OPENAI_API_KEY
-  geminiApiKeyEnvironmentVariable: GEMINI_API_KEY
-  captureResolution: 768
-  imageDetail: low
-  maxOutputTokens: 220
-  fieldOfView: 38
-  framingPadding: 1.35
-  showDebugOverlay: 1
-  instructions: "\u4F60\u662F Unity \u4F1A\u8BAE\u5BA4\u9003\u8131\u539F\u578B\u4E2D\u7684\u89C6\u89C9\u8BC6\u522B
-    AI\u3002\u4F60\u4F1A\u6536\u5230\u73A9\u5BB6\u5F53\u524D\u4EA4\u4E92\u7269\u4F53\u7684\u622A\u56FE\u3002\u8BF7\u4F18\u5148\u6839\u636E\u56FE\u7247\u5224\u65AD\u8FD9\u662F\u4EC0\u4E48\u7269\u4F53\uFF0C\u518D\u7ED3\u5408\u4F1A\u8BAE\u5BA4\u9003\u8131\u4EFB\u52A1\u7ED9\u51FA\u4E00\u53E5\u81EA\u7136\u4E2D\u6587\u53CD\u9988\u3002\u4E0D\u8981\u53EA\u4F9D\u8D56
-    object_id\uFF1B\u5982\u679C\u56FE\u50CF\u770B\u4E0D\u6E05\uFF0C\u8BF7\u660E\u786E\u8BF4\u770B\u4E0D\u6E05\u3002\u4E0D\u8981\u76F4\u63A5\u6CC4\u9732\u6700\u7EC8\u5BC6\u7801\u3002\u8F93\u51FA\u683C\u5F0F\uFF1A\u89C6\u89C9\u8BC6\u522B\uFF1A...
-    \u53CD\u9988\uFF1A..."
---- !u!4 &148151767
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 148151765}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11.71429, y: 8.2, z: 11.71429}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &150614957
 GameObject:
   m_ObjectHideFlags: 0
@@ -3154,6 +3115,7 @@ GameObject:
   - component: {fileID: 160433998}
   - component: {fileID: 7300000033}
   - component: {fileID: 7900000014}
+  - component: {fileID: 1269459194}
   m_Layer: 0
   m_Name: Left Back Floor Plant
   m_TagString: Untagged
@@ -4777,6 +4739,7 @@ GameObject:
   - component: {fileID: 235560785}
   - component: {fileID: 235560784}
   - component: {fileID: 235560783}
+  - component: {fileID: 235560786}
   m_Layer: 0
   m_Name: Pen Right
   m_TagString: Untagged
@@ -4877,6 +4840,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 235560781}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &235560786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 235560781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &236169217
 GameObject:
   m_ObjectHideFlags: 0
@@ -5341,6 +5323,7 @@ GameObject:
   m_Component:
   - component: {fileID: 265705568}
   - component: {fileID: 7300000010}
+  - component: {fileID: 919687145}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -5685,6 +5668,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287343736}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &296784997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575176793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!21 &298027350
 Material:
   serializedVersion: 8
@@ -6953,6 +6955,7 @@ GameObject:
   m_Component:
   - component: {fileID: 326599795}
   - component: {fileID: 7300000007}
+  - component: {fileID: 549592949}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -7567,6 +7570,7 @@ GameObject:
   - component: {fileID: 357638903}
   - component: {fileID: 7300000030}
   - component: {fileID: 7900000011}
+  - component: {fileID: 3389363}
   m_Layer: 0
   m_Name: Open Notebook Left
   m_TagString: Untagged
@@ -8421,6 +8425,44 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &398531585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682710445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
+--- !u!114 &398693583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 119337048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &411222463
 GameObject:
   m_ObjectHideFlags: 0
@@ -8840,6 +8882,7 @@ GameObject:
   - component: {fileID: 450274125}
   - component: {fileID: 7300000029}
   - component: {fileID: 7900000007}
+  - component: {fileID: 609173187}
   m_Layer: 0
   m_Name: Presentation Remote
   m_TagString: Untagged
@@ -9564,6 +9607,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 521288862}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &524548158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001751372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &533273711
 GameObject:
   m_ObjectHideFlags: 0
@@ -9900,6 +9962,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 533745218}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &549592949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326599794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &554103183
 GameObject:
   m_ObjectHideFlags: 0
@@ -10945,6 +11026,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 602041156}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &609173187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450274123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &620686827
 GameObject:
   m_ObjectHideFlags: 0
@@ -11620,6 +11720,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 650061670}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &652572834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717476028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &654168612
 GameObject:
   m_ObjectHideFlags: 0
@@ -12304,6 +12423,7 @@ GameObject:
   m_Component:
   - component: {fileID: 682710446}
   - component: {fileID: 7300000013}
+  - component: {fileID: 398531585}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -12781,6 +12901,7 @@ GameObject:
   m_Component:
   - component: {fileID: 717476029}
   - component: {fileID: 7300000008}
+  - component: {fileID: 652572834}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -13152,6 +13273,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 725937463}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &726202348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295910833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &727863895
 GameObject:
   m_ObjectHideFlags: 0
@@ -13386,6 +13526,7 @@ GameObject:
   m_Component:
   - component: {fileID: 754601252}
   - component: {fileID: 7300000011}
+  - component: {fileID: 1136208989}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -13553,6 +13694,7 @@ MonoBehaviour:
   interactionCamera: {fileID: 0}
   interactionRange: 3
   interactKey: 101
+  grabKey: 102
   showDebugPrompt: 1
 --- !u!1 &764006865
 GameObject:
@@ -16000,6 +16142,7 @@ GameObject:
   - component: {fileID: 882623610}
   - component: {fileID: 7300000035}
   - component: {fileID: 7900000016}
+  - component: {fileID: 7900000019}
   m_Layer: 0
   m_Name: Entry Side Floor Plant
   m_TagString: Untagged
@@ -16227,6 +16370,25 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &919687145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265705567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &924408335
 GameObject:
   m_ObjectHideFlags: 0
@@ -16631,6 +16793,7 @@ GameObject:
   - component: {fileID: 942075664}
   - component: {fileID: 7300000036}
   - component: {fileID: 7900000017}
+  - component: {fileID: 7900000018}
   m_Layer: 0
   m_Name: Small Table Plant
   m_TagString: Untagged
@@ -16769,6 +16932,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 945806029}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &948827741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341993764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &950547176
 GameObject:
   m_ObjectHideFlags: 0
@@ -17553,6 +17735,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1001751373}
   - component: {fileID: 7300000015}
+  - component: {fileID: 524548158}
   m_Layer: 0
   m_Name: Computer Desk
   m_TagString: Untagged
@@ -20243,6 +20426,7 @@ GameObject:
   - component: {fileID: 1114192740}
   - component: {fileID: 1114192739}
   - component: {fileID: 1114192738}
+  - component: {fileID: 1114192741}
   m_Layer: 0
   m_Name: Pen Left
   m_TagString: Untagged
@@ -20343,6 +20527,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1114192736}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1114192741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114192736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &1117866293
 GameObject:
   m_ObjectHideFlags: 0
@@ -20985,6 +21188,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1134734319}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1136208989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754601251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &1140947530
 GameObject:
   m_ObjectHideFlags: 0
@@ -21149,6 +21371,7 @@ GameObject:
   - component: {fileID: 1157177703}
   - component: {fileID: 7300000034}
   - component: {fileID: 7900000015}
+  - component: {fileID: 7900000020}
   m_Layer: 0
   m_Name: Right Back Floor Plant
   m_TagString: Untagged
@@ -23886,6 +24109,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268041581}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1269459194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160433997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1001 &1281166217
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24414,6 +24656,7 @@ GameObject:
   - component: {fileID: 1295910835}
   - component: {fileID: 7300000031}
   - component: {fileID: 7900000012}
+  - component: {fileID: 726202348}
   m_Layer: 0
   m_Name: Open Notebook Right
   m_TagString: Untagged
@@ -25542,6 +25785,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1341993765}
   - component: {fileID: 7300000009}
+  - component: {fileID: 948827741}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -27135,6 +27379,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1453377842}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1458263412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1982990310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!1 &1461030451
 GameObject:
   m_ObjectHideFlags: 0
@@ -27730,6 +27993,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1479341805}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1480402186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7600000000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: 0
+  drawDebugRays: 1
 --- !u!1 &1490440406
 GameObject:
   m_ObjectHideFlags: 0
@@ -29572,6 +29854,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1575176794}
   - component: {fileID: 7300000006}
+  - component: {fileID: 296784997}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -32710,6 +32993,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1795089163}
+  - component: {fileID: 1795089164}
   m_Layer: 0
   m_Name: Mug Right
   m_TagString: Untagged
@@ -32735,6 +33019,25 @@ Transform:
   - {fileID: 1299706071}
   m_Father: {fileID: 8389490}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1795089164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795089162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.2
+  drawDebugRays: 1
 --- !u!1001 &1799291648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34573,6 +34876,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1897008643}
+  - component: {fileID: 1897008644}
   m_Layer: 0
   m_Name: Mug Left
   m_TagString: Untagged
@@ -34598,6 +34902,25 @@ Transform:
   - {fileID: 54463309}
   m_Father: {fileID: 8389490}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1897008644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897008642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.2
+  drawDebugRays: 1
 --- !u!1 &1901062602
 GameObject:
   m_ObjectHideFlags: 0
@@ -36783,6 +37106,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1982990311}
   - component: {fileID: 7300000014}
+  - component: {fileID: 1458263412}
   m_Layer: 0
   m_Name: Conference Chair
   m_TagString: Untagged
@@ -40575,6 +40899,7 @@ GameObject:
   - component: {fileID: 7600000002}
   - component: {fileID: 7600000003}
   - component: {fileID: 7900000010}
+  - component: {fileID: 1480402186}
   m_Layer: 0
   m_Name: Openable Cabinet
   m_TagString: Untagged
@@ -45251,6 +45576,63 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   identity: {fileID: 7300000036}
   fallbackDescription: 
+--- !u!114 &7900000018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942075663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.2
+  drawDebugRays: 1
+--- !u!114 &7900000019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882623609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
+--- !u!114 &7900000020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157177702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80626faae0bd66e4e994de0a58bd5205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
+  holdOffset: {x: 0, y: -0.2, z: 0.8}
+  holdRotation: {x: 0, y: 0, z: 0}
+  forwardRayDistance: 3
+  downRayDistance: 5
+  extraHeightOffset: 0
+  manualVerticalOffset: -0.25
+  drawDebugRays: 1
 --- !u!114 &7900000100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45469,8 +45851,4 @@ SceneRoots:
   - {fileID: 952334434}
   - {fileID: 1650224854}
   - {fileID: 1656782733}
-<<<<<<< HEAD
-  - {fileID: 148151767}
-=======
   - {fileID: 1963651151}
->>>>>>> main
