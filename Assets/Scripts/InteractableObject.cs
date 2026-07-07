@@ -41,7 +41,14 @@ public sealed class InteractableObject : MonoBehaviour
         string objectId = ObjectId;
         string description = GetDescription();
         Debug.Log($"Interacted with: {objectId} | {description}", this);
+<<<<<<< HEAD
+        if (GptVisionInteractionManager.Instance != null)
+{
+    GptVisionInteractionManager.Instance.AnalyzeObject(gameObject, objectId, description);
+}
+=======
         NotifyExternalInteraction(objectId, this);
+>>>>>>> main
 
         switch (objectId)
         {

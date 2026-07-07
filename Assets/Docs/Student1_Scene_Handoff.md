@@ -93,12 +93,7 @@ Seat 4 = square
 
 Screen mapping:
 
-```text
-triangle = 4
-circle = 3
-square = 2
-star = 1
-```
+
 
 Developer-only solution:
 
