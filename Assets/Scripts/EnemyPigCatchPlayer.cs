@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class EnemyPigCatchPlayer : MonoBehaviour
 {
@@ -18,12 +17,16 @@ public class EnemyPigCatchPlayer : MonoBehaviour
         {
             hasCaughtPlayer = true;
 
-            Debug.Log("EnemyPig caught the player. Restarting scene.");
+            Debug.Log("EnemyPigCatchPlayer: Pig caught the player.");
 
-            Time.timeScale = 1f;
-
-            Scene currentScene = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(currentScene.name);
+            if (PigGameOverManager.Instance != null)
+            {
+                PigGameOverManager.Instance.ShowGameOver();
+            }
+            else
+            {
+                Debug.LogWarning("EnemyPigCatchPlayer: PigGameOverManager not found in scene.");
+            }
         }
     }
 }

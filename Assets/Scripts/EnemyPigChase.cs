@@ -18,7 +18,7 @@ public class EnemyPigChase : MonoBehaviour
 
         if (agent == null)
         {
-            Debug.LogError("EnemyPigChase: No NavMeshAgent found on this object.");
+            Debug.LogError("EnemyPigChase: No NavMeshAgent found on the pig.");
             return;
         }
 
@@ -49,7 +49,7 @@ public class EnemyPigChase : MonoBehaviour
 
         if (!agent.isOnNavMesh)
         {
-            Debug.LogWarning("EnemyPigChase: EnemyPig is not on NavMesh.");
+            Debug.LogWarning("EnemyPigChase: Pig is not on NavMesh.");
             return;
         }
 
