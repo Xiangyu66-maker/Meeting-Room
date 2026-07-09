@@ -13,6 +13,12 @@ public class EnemyPigCatchPlayer : MonoBehaviour
             return;
         }
 
+        if (PlayerHideState.IsHidden)
+        {
+            Debug.Log("Pig touched player, but player is hidden.");
+            return;
+        }
+
         if (other.CompareTag(playerTag))
         {
             hasCaughtPlayer = true;
