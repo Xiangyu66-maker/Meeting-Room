@@ -180,6 +180,28 @@ public sealed class GrabbableObject : MonoBehaviour
         playerCamera = null;
         isHeld = false;
         Debug.Log($"Dropped {gameObject.name} at {transform.position}");
+
+        // 在放置完成后，检测正下方物体并触发事件
+        GameObject surface = GetSurfaceBelow();
+        if (PuzzleEventManager.Instance != null)
+        {
+            string id = GetComponent<ObjectIdentity>()?.ObjectId ?? gameObject.name;
+            PuzzleEventManager.Instance.NotifyItemDropped(id, surface);
+        }
+    }
+
+    private GameObject GetSurfaceBelow()
+    {
+        Vector3 origin = transform.position + Vector3.up * 0.1f; // 从中心稍上一点发射
+        Ray ray = new Ray(origin, Vector3.down);
+        if (Physics.Raycast(ray, out RaycastHit hit, 1.0f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        {
+            // 排除自身及子物体
+            if (hit.collider.transform.IsChildOf(transform))
+                return null;
+            return hit.collider.gameObject;
+        }
+        return null;
     }
 
     private RaycastHit? GetFirstValidHit(RaycastHit[] hits)
