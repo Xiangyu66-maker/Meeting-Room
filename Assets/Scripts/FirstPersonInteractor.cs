@@ -7,6 +7,7 @@ public sealed class FirstPersonInteractor : MonoBehaviour
     [SerializeField] private Camera interactionCamera;
     [SerializeField] private float interactionRange = 2f;   // 用户要求小于2m，设为默认2m
     [SerializeField] private KeyCode interactKey = KeyCode.E;
+    [SerializeField] private KeyCode vlmKey = KeyCode.Q;
     [SerializeField] private KeyCode grabKey = KeyCode.F;   // 新增拾取/放置键
     [SerializeField] private bool showDebugPrompt = true;
 
@@ -47,6 +48,15 @@ public sealed class FirstPersonInteractor : MonoBehaviour
         if (currentTarget != null && Input.GetKeyDown(interactKey))
         {
             currentTarget.Interact();
+        }
+
+        if (currentTarget != null && Input.GetKeyDown(vlmKey))
+        {
+            GptVisionInteractionManager manager = GptVisionInteractionManager.Instance;
+            if (manager != null)
+            {
+                manager.AnalyzeObject(currentTarget.gameObject, currentTarget.ObjectId, currentTarget.Description);
+            }
         }
 
         // ---- 新增抓取/放置逻辑（F键） ----
@@ -131,7 +141,7 @@ public sealed class FirstPersonInteractor : MonoBehaviour
         // 显示交互提示（E键）
         if (currentTarget != null)
         {
-            GUI.Label(new Rect((Screen.width - 180f) * 0.5f, Screen.height - 72f, 180f, 28f), "Press E to interact");
+            GUI.Label(new Rect((Screen.width - 180f) * 0.5f, Screen.height - 72f, 180f, 28f), "Press E to interact | Q for VLM");
         }
 
         // 显示抓取/放置提示（F键）

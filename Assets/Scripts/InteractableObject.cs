@@ -25,6 +25,7 @@ public sealed class InteractableObject : MonoBehaviour
     }
 
     public string ObjectId => Identity != null ? Identity.ObjectId : gameObject.name;
+    public string Description => GetDescription();
 
     public static void NotifyExternalInteraction(string objectId, InteractableObject source = null)
     {
