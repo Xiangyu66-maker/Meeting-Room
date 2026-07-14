@@ -25,10 +25,16 @@ public class PuzzleEventManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+<<<<<<< Updated upstream
             DontDestroyOnLoad(gameObject);
         }
         else if (Instance != this)
         {
+=======
+            Debug.Log("PuzzleEventManager initialized.");
+        }
+        else
+>>>>>>> Stashed changes
             Destroy(gameObject);
         }
     }

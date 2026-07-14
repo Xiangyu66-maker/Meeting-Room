@@ -178,17 +178,25 @@ public sealed class GrabbableObject : MonoBehaviour
         isHeld = false;
         Debug.Log($"Dropped {gameObject.name} at {transform.position}");
 
+<<<<<<< Updated upstream
         // ---------- 触发放置事件 ----------
+=======
+        // 在 Drop() 末尾添加
+>>>>>>> Stashed changes
         GameObject surface = GetSurfaceBelow();
         if (PuzzleEventManager.Instance != null)
         {
             string id = GetComponent<ObjectIdentity>()?.ObjectId ?? gameObject.name;
             PuzzleEventManager.Instance.NotifyItemDropped(id, surface);
+<<<<<<< Updated upstream
             Debug.Log($"GrabbableObject: Triggered drop event for {id} on {surface?.name ?? "null"}");
         }
         else
         {
             Debug.LogWarning("PuzzleEventManager.Instance is null, cannot trigger drop event.");
+=======
+            Debug.Log($"Triggered drop event for {id} on {surface?.name ?? "null"}");
+>>>>>>> Stashed changes
         }
     }
 
