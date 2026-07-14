@@ -32998,6 +32998,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1795089163}
   - component: {fileID: 1795089164}
+  - component: {fileID: 1795089166}
+  - component: {fileID: 1795089165}
   m_Layer: 0
   m_Name: Mug Right
   m_TagString: Untagged
@@ -33042,6 +33044,35 @@ MonoBehaviour:
   extraHeightOffset: 0
   manualVerticalOffset: -0.2
   drawDebugRays: 1
+--- !u!114 &1795089165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795089162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a0c0c0e8c9f4a18a2c03d5f0c7c6f19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractableObject
+  identity: {fileID: 1795089166}
+  fallbackDescription: 
+--- !u!114 &1795089166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795089162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8066a401e257e64593a534a39a48cc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectIdentity
+  object_id: cup_01
+  category: 
+  description: 
 --- !u!1001 &1799291648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34881,6 +34912,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1897008643}
   - component: {fileID: 1897008644}
+  - component: {fileID: 1897008646}
+  - component: {fileID: 1897008645}
   m_Layer: 0
   m_Name: Mug Left
   m_TagString: Untagged
@@ -34925,6 +34958,35 @@ MonoBehaviour:
   extraHeightOffset: 0
   manualVerticalOffset: -0.2
   drawDebugRays: 1
+--- !u!114 &1897008645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897008642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a0c0c0e8c9f4a18a2c03d5f0c7c6f19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractableObject
+  identity: {fileID: 1897008646}
+  fallbackDescription: 
+--- !u!114 &1897008646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897008642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8066a401e257e64593a534a39a48cc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectIdentity
+  object_id: cup_02
+  category: 
+  description: 
 --- !u!1 &1901062602
 GameObject:
   m_ObjectHideFlags: 0

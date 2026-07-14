@@ -1,91 +1,136 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// 谜题管理器：监听物品拾取/放置事件，更新谜题状态，触发机关。
-/// 挂载到场景中的空物体上（如 "_PuzzleManager"）。
-/// </summary>
 public class PuzzleManager : MonoBehaviour
 {
-    [Header("谜题配置")]
-    [SerializeField] private string[] requiredItemsForDoor = { "document_01", "remote_01" }; // 集齐后开门
-    [SerializeField] private string remoteId = "remote_01";       // 遥控器ID
-    [SerializeField] private string screenId = "screen_01";       // 屏幕ID
-    [SerializeField] private string doorId = "locked_door_01";    // 门ID
+    public static PuzzleManager Instance { get; private set; }
 
-    // 状态记录
+    [Header("谜题配置")]
+    [SerializeField] private string[] requiredItemsForDoor = { "document_01", "remote_01" };
+    [SerializeField] private string remoteId = "remote_01";
+    [SerializeField] private string screenId = "screen_01";
+    [SerializeField] private string doorId = "locked_door_01";
+
+    [Header("座椅配置")]
+    [SerializeField] private string seatIdPrefix = "chair_";
+
     private HashSet<string> collectedItems = new HashSet<string>();
     private bool doorUnlocked = false;
     private bool screenActivated = false;
+    private bool cupClueTriggered = false;
 
-    // 缓存引用
     private DoorController doorController;
     private GameObject screenObject;
 
-    private void Start()
+    // ---------- 自动创建 ----------
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void AutoCreateAndSubscribe()
     {
-        // 查找场景中的门和屏幕
-        doorController = FindDoor();
-        screenObject = FindScreen();
-
-        // 订阅事件
-        if (PuzzleEventManager.Instance != null)
+        if (Instance == null)
         {
-            PuzzleEventManager.Instance.OnItemGrabbed += OnItemGrabbedHandler;
-            PuzzleEventManager.Instance.OnItemDropped += OnItemDroppedHandler;
+            // 查找场景中是否已有 PuzzleManager
+            PuzzleManager existing = FindObjectOfType<PuzzleManager>();
+            if (existing != null)
+            {
+                Instance = existing;
+                Instance.SubscribeEvents();
+                Debug.Log("PuzzleManager found in scene and subscribed.");
+                return;
+            }
+
+            // 否则创建新对象
+            GameObject go = new GameObject("PuzzleManager");
+            Instance = go.AddComponent<PuzzleManager>();
+            DontDestroyOnLoad(go);
+            Instance.SubscribeEvents();
+            Debug.Log("PuzzleManager auto-created and subscribed.");
         }
         else
         {
-            Debug.LogWarning("PuzzleEventManager 未找到，请确保场景中有 PuzzleEventManager 组件。");
+            Instance.SubscribeEvents();
         }
+    }
+
+    private void Awake()
+    {
+        // 如果 Instance 为空，设为自己（防止重复）
+        if (Instance == null)
+        {
+            Instance = this;
+            SubscribeEvents();
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
+
+    private void SubscribeEvents()
+    {
+        if (PuzzleEventManager.Instance != null)
+        {
+            PuzzleEventManager.Instance.OnItemGrabbed -= OnItemGrabbedHandler; // 防止重复订阅
+            PuzzleEventManager.Instance.OnItemDropped -= OnItemDroppedHandler;
+            PuzzleEventManager.Instance.OnItemGrabbed += OnItemGrabbedHandler;
+            PuzzleEventManager.Instance.OnItemDropped += OnItemDroppedHandler;
+            Debug.Log("PuzzleManager subscribed to events.");
+        }
+        else
+        {
+            Debug.LogWarning("PuzzleEventManager.Instance is null, will retry later.");
+            // 可选：延迟重试
+            Invoke(nameof(SubscribeEvents), 0.5f);
+        }
+    }
+
+    private void Start()
+    {
+        doorController = FindDoor();
+        screenObject = FindScreen();
     }
 
     private void OnDestroy()
     {
-        // 取消订阅，防止内存泄漏
         if (PuzzleEventManager.Instance != null)
         {
             PuzzleEventManager.Instance.OnItemGrabbed -= OnItemGrabbedHandler;
             PuzzleEventManager.Instance.OnItemDropped -= OnItemDroppedHandler;
         }
+        if (Instance == this) Instance = null;
     }
 
-    // ---------- 事件处理器 ----------
+    // ---------- 事件处理 ----------
     private void OnItemGrabbedHandler(string objectId)
     {
         Debug.Log($"拾取事件: {objectId}");
-
-        // 记录拾取（所有物品都记录，但只有配置的才用于检查）
         collectedItems.Add(objectId);
-
-        // 1. 单步触发：捡到遥控器 → 激活屏幕（但这里我们改由“放置”触发，所以注释掉）
-        // 如果想改为拾取即触发，取消注释：
-        // if (objectId == remoteId) ActivateScreen();
-
-        // 2. 多重收集：检查集齐物品
         CheckDoorCollection();
     }
 
     private void OnItemDroppedHandler(string objectId, GameObject surface)
     {
         if (surface == null) return;
-
-        string surfaceId = surface.GetComponent<ObjectIdentity>()?.ObjectId;
+        string surfaceId = GetRootObjectId(surface);
         Debug.Log($"放置事件: {objectId} 放在了 {(surfaceId ?? surface.name)} 上");
 
-        // 3. 放置机关：把遥控器放在屏幕上 → 激活屏幕
+        // 茶杯放任意座椅
+        if (!cupClueTriggered && objectId == "cup_01" && surfaceId != null && surfaceId.StartsWith(seatIdPrefix))
+        {
+            TriggerCupOnSeatClue();
+        }
+
+        // 遥控器放屏幕
         if (objectId == remoteId && surfaceId == screenId)
         {
             ActivateScreen();
         }
-
-        // 可以添加更多放置规则，例如把文档放在桌子上触发提示等
     }
 
-    // ---------- 谜题逻辑函数 ----------
+    // ---------- 谜题逻辑 ----------
     private void CheckDoorCollection()
     {
-        if (doorUnlocked) return; // 已解锁不再重复
+        if (doorUnlocked) return;
 
         bool allCollected = true;
         foreach (string id in requiredItemsForDoor)
@@ -123,52 +168,82 @@ public class PuzzleManager : MonoBehaviour
 
         if (screenObject != null)
         {
-            // 示例：改变屏幕颜色，或显示密码文字
             Renderer r = screenObject.GetComponent<Renderer>();
             if (r != null)
             {
                 r.material.color = Color.green;
                 Debug.Log("屏幕已激活（绿色）");
             }
-
-            // 如果屏幕上有 TextMeshPro 或 UI 文字，可以显示密码
-            // 例如：screenObject.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "密码: 3142";
         }
         else
         {
             Debug.LogWarning("屏幕对象未找到，无法激活。");
         }
-
         screenActivated = true;
-        // 触发其他效果（如成就、音效等）
     }
 
-    // ---------- 辅助查找方法 ----------
+    private void TriggerCupOnSeatClue()
+    {
+        cupClueTriggered = true;
+
+        // 显示提示
+        GameResultUI ui = GameResultUI.GetOrCreate();
+        if (ui != null)
+            ui.ShowMessage("你拿起茶杯，发现下面压着一张纸条：密码第一位是 3！");
+
+        // 加入背包
+        InventoryManager inv = InventoryManager.GetOrCreate();
+        if (inv != null)
+        {
+            InventoryItem clue = new InventoryItem("cup_clue_note", "茶杯下的纸条", "note", "密码第一位是 3。");
+            inv.AddItem(clue);
+        }
+
+        Debug.Log("茶杯座椅线索已触发！");
+    }
+
+    // ---------- 辅助 ----------
+    private string GetRootObjectId(GameObject obj)
+    {
+        if (obj == null) return null;
+
+        ObjectIdentity id = obj.GetComponent<ObjectIdentity>();
+        if (id != null && !string.IsNullOrWhiteSpace(id.ObjectId))
+            return id.ObjectId;
+
+        Transform current = obj.transform.parent;
+        while (current != null)
+        {
+            id = current.GetComponent<ObjectIdentity>();
+            if (id != null && !string.IsNullOrWhiteSpace(id.ObjectId))
+                return id.ObjectId;
+            current = current.parent;
+        }
+        return null;
+    }
+
     private DoorController FindDoor()
     {
-        // 优先通过 ObjectIdentity 查找
         ObjectIdentity[] identities = FindObjectsOfType<ObjectIdentity>();
-        foreach (var id in identities)
+        foreach (var identity in identities)
         {
-            if (id.ObjectId == doorId)
+            if (identity.ObjectId == doorId)
             {
-                DoorController door = id.GetComponent<DoorController>();
+                DoorController door = identity.GetComponent<DoorController>();
                 if (door != null) return door;
             }
         }
-        // 兜底：直接按类型查找
         return FindObjectOfType<DoorController>();
     }
 
     private GameObject FindScreen()
     {
         ObjectIdentity[] identities = FindObjectsOfType<ObjectIdentity>();
-        foreach (var id in identities)
+        foreach (var identity in identities)
         {
-            if (id.ObjectId == screenId)
-                return id.gameObject;
+            if (identity.ObjectId == screenId)
+                return identity.gameObject;
         }
-        // 兜底按名称查找
         return GameObject.Find(screenId);
     }
 }
