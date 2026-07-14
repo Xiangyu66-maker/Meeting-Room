@@ -3,31 +3,21 @@ using System.Collections.Generic;
 
 public class PuzzleManager : MonoBehaviour
 {
-<<<<<<< Updated upstream
     public static PuzzleManager Instance { get; private set; }
 
-=======
->>>>>>> Stashed changes
     [Header("谜题配置")]
     [SerializeField] private string[] requiredItemsForDoor = { "document_01", "remote_01" };
     [SerializeField] private string remoteId = "remote_01";
     [SerializeField] private string screenId = "screen_01";
     [SerializeField] private string doorId = "locked_door_01";
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
     [Header("座椅配置")]
     [SerializeField] private string seatIdPrefix = "chair_";
 
     private HashSet<string> collectedItems = new HashSet<string>();
     private bool doorUnlocked = false;
     private bool screenActivated = false;
-<<<<<<< Updated upstream
     private bool cupClueTriggered = false;
-=======
-    private bool cupClueTriggered = false;  // 新增这行
->>>>>>> Stashed changes
 
     private DoorController doorController;
     private GameObject screenObject;
@@ -36,14 +26,7 @@ public class PuzzleManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void AutoCreateAndSubscribe()
     {
-<<<<<<< Updated upstream
         if (Instance == null)
-=======
-        doorController = FindDoor();
-        screenObject = FindScreen();
-
-        if (PuzzleEventManager.Instance != null)
->>>>>>> Stashed changes
         {
             // 查找场景中是否已有 PuzzleManager
             PuzzleManager existing = FindObjectOfType<PuzzleManager>();
@@ -117,27 +100,17 @@ public class PuzzleManager : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-<<<<<<< Updated upstream
     // ---------- 事件处理 ----------
     private void OnItemGrabbedHandler(string objectId)
     {
         Debug.Log($"拾取事件: {objectId}");
         collectedItems.Add(objectId);
-=======
-    private void OnItemGrabbedHandler(string objectId)
-    {
-        Debug.Log($"拾取事件: {objectId}");
-
-        collectedItems.Add(objectId);
-
->>>>>>> Stashed changes
         CheckDoorCollection();
     }
 
     private void OnItemDroppedHandler(string objectId, GameObject surface)
     {
         if (surface == null) return;
-<<<<<<< Updated upstream
         string surfaceId = GetRootObjectId(surface);
         Debug.Log($"放置事件: {objectId} 放在了 {(surfaceId ?? surface.name)} 上");
 
@@ -148,54 +121,16 @@ public class PuzzleManager : MonoBehaviour
         }
 
         // 遥控器放屏幕
-=======
-
-        // 获取表面物体的根级 ObjectId（向上查找）
-        string surfaceId = GetRootObjectId(surface);
-        Debug.Log($"放置事件: {objectId} 放在了 {(surfaceId ?? surface.name)} 上");
-
-        // 原有逻辑：遥控器放屏幕
->>>>>>> Stashed changes
         if (objectId == remoteId && surfaceId == screenId)
         {
             ActivateScreen();
         }
-<<<<<<< Updated upstream
     }
 
     // ---------- 谜题逻辑 ----------
     private void CheckDoorCollection()
     {
         if (doorUnlocked) return;
-=======
-
-        // 新增：茶杯放在任意座椅上触发线索
-        if (!cupClueTriggered && objectId == "cup_01" && surfaceId != null && surfaceId.StartsWith(seatIdPrefix))
-        {
-            TriggerCupOnSeatClue();
-        }
-    }
-
-    private void TriggerCupOnSeatClue()
-    {
-        cupClueTriggered = true;
-        GameResultUI ui = GameResultUI.GetOrCreate();
-        if (ui != null)
-            ui.ShowMessage("你拿起茶杯，发现下面压着一张纸条：密码第一位是 3！");
-
-        InventoryManager inv = InventoryManager.GetOrCreate();
-        if (inv != null)
-        {
-            InventoryItem clue = new InventoryItem("cup_clue_note", "茶杯下的纸条", "note", "密码第一位是 3。");
-            inv.AddItem(clue);
-        }
-        Debug.Log("茶杯座椅线索已触发！");
-    }
-
-    private void CheckDoorCollection()
-    {
-        if (doorUnlocked) return; 
->>>>>>> Stashed changes
 
         bool allCollected = true;
         foreach (string id in requiredItemsForDoor)
@@ -245,7 +180,6 @@ public class PuzzleManager : MonoBehaviour
             Debug.LogWarning("屏幕对象未找到，无法激活。");
         }
         screenActivated = true;
-<<<<<<< Updated upstream
     }
 
     private void TriggerCupOnSeatClue()
@@ -288,11 +222,6 @@ public class PuzzleManager : MonoBehaviour
         return null;
     }
 
-=======
-
-    }
-
->>>>>>> Stashed changes
     private DoorController FindDoor()
     {
         ObjectIdentity[] identities = FindObjectsOfType<ObjectIdentity>();
@@ -316,40 +245,5 @@ public class PuzzleManager : MonoBehaviour
                 return identity.gameObject;
         }
         return GameObject.Find(screenId);
-    }
-
-        // 在 PuzzleManager 类中添加此方法
-    private string GetRootObjectId(GameObject obj)
-    {
-        if (obj == null) return null;
-
-        // 首先检查自身
-        ObjectIdentity identity = obj.GetComponent<ObjectIdentity>();
-        if (identity != null && !string.IsNullOrWhiteSpace(identity.ObjectId))
-            return identity.ObjectId;
-
-        // 向上遍历父物体
-        Transform current = obj.transform.parent;
-        while (current != null)
-        {
-            identity = current.GetComponent<ObjectIdentity>();
-            if (identity != null && !string.IsNullOrWhiteSpace(identity.ObjectId))
-                return identity.ObjectId;
-            current = current.parent;
-        }
-        return null;
-    }
-
-    private void Awake()
-    {
-        if (PuzzleEventManager.Instance != null)
-        {
-            PuzzleEventManager.Instance.OnItemGrabbed += OnItemGrabbedHandler;
-            PuzzleEventManager.Instance.OnItemDropped += OnItemDroppedHandler;
-        }
-        else
-        {
-            Debug.LogWarning("PuzzleEventManager 未找到，请确保场景中有 PuzzleEventManager 组件。");
-        }
     }
 }
