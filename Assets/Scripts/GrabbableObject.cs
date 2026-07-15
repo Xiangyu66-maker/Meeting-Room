@@ -135,7 +135,7 @@ public sealed class GrabbableObject : MonoBehaviour
 
         // 4. 应用粗略位置
         transform.position = dropPosition;
-        CalculateObjectHeight();
+        CalculateObjectHeight(); // 重新计算确保准确
 
         // 5. 微调：从中心向下检测，精确贴合
         Vector3 adjustOrigin = transform.position + Vector3.up * 0.5f;
@@ -180,11 +180,21 @@ public sealed class GrabbableObject : MonoBehaviour
 
         // ---------- 触发放置事件 ----------
         GameObject surface = GetSurfaceBelow();
+        // 如果 surface 为 null，尝试从物体正下方检测（更宽松）
+        if (surface == null)
+        {
+            Ray fallbackRay = new Ray(transform.position, Vector3.down);
+            if (Physics.Raycast(fallbackRay, out RaycastHit fallbackHit, 1.0f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                if (!fallbackHit.collider.transform.IsChildOf(transform))
+                    surface = fallbackHit.collider.gameObject;
+            }
+        }
         if (PuzzleEventManager.Instance != null)
         {
             string id = GetComponent<ObjectIdentity>()?.ObjectId ?? gameObject.name;
             PuzzleEventManager.Instance.NotifyItemDropped(id, surface);
-            Debug.Log($"GrabbableObject: Triggered drop event for {id} on {surface?.name ?? "null"}");
+            Debug.Log($"GrabbableObject: Triggered drop event for {id} on {(surface != null ? surface.name : "null")}");
         }
         else
         {
@@ -194,9 +204,12 @@ public sealed class GrabbableObject : MonoBehaviour
 
     private GameObject GetSurfaceBelow()
     {
-        Vector3 origin = transform.position + Vector3.up * 0.1f;
-        Ray ray = new Ray(origin, Vector3.down);
-        if (Physics.Raycast(ray, out RaycastHit hit, 1.0f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        // 从物体底部发射射线
+        Vector3 origin = transform.position - Vector3.up * objectHalfHeight;
+        Ray ray = new Ray(origin + Vector3.up * 0.01f, Vector3.down);
+        float maxDistance = 0.5f;
+
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
         {
             if (hit.collider.transform.IsChildOf(transform))
                 return null;
@@ -204,6 +217,7 @@ public sealed class GrabbableObject : MonoBehaviour
         }
         return null;
     }
+
 
     private RaycastHit? GetFirstValidHit(RaycastHit[] hits)
     {

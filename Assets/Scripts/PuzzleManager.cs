@@ -14,21 +14,24 @@ public class PuzzleManager : MonoBehaviour
     [Header("座椅配置")]
     [SerializeField] private string seatIdPrefix = "chair_";
 
+    [Header("笔记本线索")]
+    [SerializeField] private string notebookId = "document_01";
+    [SerializeField] private string deskTargetId = "computer_desk_01";
+
     private HashSet<string> collectedItems = new HashSet<string>();
     private bool doorUnlocked = false;
     private bool screenActivated = false;
     private bool cupClueTriggered = false;
+    private bool notebookClueTriggered = false;
 
     private DoorController doorController;
     private GameObject screenObject;
 
-    // ---------- 自动创建 ----------
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void AutoCreateAndSubscribe()
     {
         if (Instance == null)
         {
-            // 查找场景中是否已有 PuzzleManager
             PuzzleManager existing = FindObjectOfType<PuzzleManager>();
             if (existing != null)
             {
@@ -38,7 +41,6 @@ public class PuzzleManager : MonoBehaviour
                 return;
             }
 
-            // 否则创建新对象
             GameObject go = new GameObject("PuzzleManager");
             Instance = go.AddComponent<PuzzleManager>();
             DontDestroyOnLoad(go);
@@ -100,7 +102,7 @@ public class PuzzleManager : MonoBehaviour
 
     private void OnItemGrabbedHandler(string objectId)
     {
-        Debug.Log($"拾取事件: {objectId}");
+        Debug.Log($"Pickup event: {objectId}");
         collectedItems.Add(objectId);
         CheckDoorCollection();
     }
@@ -109,13 +111,21 @@ public class PuzzleManager : MonoBehaviour
     {
         if (surface == null) return;
         string surfaceId = GetRootObjectId(surface);
-        Debug.Log($"放置事件: {objectId} 放在了 {(surfaceId ?? surface.name)} 上");
+        Debug.Log($"Drop event: {objectId} on '{surface.name}', rootId='{surfaceId}'");
 
+        // 茶杯放任意座椅
         if (!cupClueTriggered && objectId == "cup_01" && surfaceId != null && surfaceId.StartsWith(seatIdPrefix))
         {
             TriggerCupOnSeatClue();
         }
 
+        // 笔记本放电脑桌
+        if (!notebookClueTriggered && objectId == notebookId && surfaceId == deskTargetId)
+        {
+            TriggerNotebookOnDeskClue();
+        }
+
+        // 遥控器放屏幕
         if (objectId == remoteId && surfaceId == screenId)
         {
             ActivateScreen();
@@ -148,11 +158,11 @@ public class PuzzleManager : MonoBehaviour
         {
             doorController.UnlockDoor();
             doorUnlocked = true;
-            Debug.Log("门已解锁！（通过集齐物品）");
+            Debug.Log("Door unlocked! (by collecting items)");
         }
         else
         {
-            Debug.LogWarning("门控制器未找到，无法解锁。");
+            Debug.LogWarning("DoorController not found, cannot unlock.");
         }
     }
 
@@ -166,12 +176,12 @@ public class PuzzleManager : MonoBehaviour
             if (r != null)
             {
                 r.material.color = Color.green;
-                Debug.Log("屏幕已激活（绿色）");
+                Debug.Log("Screen activated (green)");
             }
         }
         else
         {
-            Debug.LogWarning("屏幕对象未找到，无法激活。");
+            Debug.LogWarning("Screen object not found, cannot activate.");
         }
         screenActivated = true;
     }
@@ -180,12 +190,10 @@ public class PuzzleManager : MonoBehaviour
     {
         cupClueTriggered = true;
 
-        // 显示提示
         GameResultUI ui = GameResultUI.GetOrCreate();
         if (ui != null)
             ui.ShowMessage("You pick up the cup and find a note underneath: The first digit is 3!");
 
-        // 加入背包
         InventoryManager inv = InventoryManager.GetOrCreate();
         if (inv != null)
         {
@@ -193,9 +201,28 @@ public class PuzzleManager : MonoBehaviour
             inv.AddItem(clue);
         }
 
-        Debug.Log("茶杯座椅线索已触发");
+        Debug.Log("Cup-on-seat clue triggered!");
     }
 
+    private void TriggerNotebookOnDeskClue()
+    {
+        notebookClueTriggered = true;
+
+        GameResultUI ui = GameResultUI.GetOrCreate();
+        if (ui != null)
+            ui.ShowMessage("You find a sticky note on the computer desk: The second digit is 1!");
+
+        InventoryManager inv = InventoryManager.GetOrCreate();
+        if (inv != null)
+        {
+            InventoryItem clue = new InventoryItem("notebook_clue_note", "Sticky Note", "note", "The second digit is 1.");
+            inv.AddItem(clue);
+        }
+
+        Debug.Log("Notebook-on-desk clue triggered!");
+    }
+
+    // ---------- 辅助 ----------
     private string GetRootObjectId(GameObject obj)
     {
         if (obj == null) return null;
