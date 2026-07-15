@@ -53,7 +53,6 @@ public class PuzzleManager : MonoBehaviour
 
     private void Awake()
     {
-        // 如果 Instance 为空，设为自己（防止重复）
         if (Instance == null)
         {
             Instance = this;
@@ -70,7 +69,7 @@ public class PuzzleManager : MonoBehaviour
     {
         if (PuzzleEventManager.Instance != null)
         {
-            PuzzleEventManager.Instance.OnItemGrabbed -= OnItemGrabbedHandler; // 防止重复订阅
+            PuzzleEventManager.Instance.OnItemGrabbed -= OnItemGrabbedHandler;
             PuzzleEventManager.Instance.OnItemDropped -= OnItemDroppedHandler;
             PuzzleEventManager.Instance.OnItemGrabbed += OnItemGrabbedHandler;
             PuzzleEventManager.Instance.OnItemDropped += OnItemDroppedHandler;
@@ -79,7 +78,6 @@ public class PuzzleManager : MonoBehaviour
         else
         {
             Debug.LogWarning("PuzzleEventManager.Instance is null, will retry later.");
-            // 可选：延迟重试
             Invoke(nameof(SubscribeEvents), 0.5f);
         }
     }
@@ -100,7 +98,6 @@ public class PuzzleManager : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    // ---------- 事件处理 ----------
     private void OnItemGrabbedHandler(string objectId)
     {
         Debug.Log($"拾取事件: {objectId}");
@@ -114,20 +111,17 @@ public class PuzzleManager : MonoBehaviour
         string surfaceId = GetRootObjectId(surface);
         Debug.Log($"放置事件: {objectId} 放在了 {(surfaceId ?? surface.name)} 上");
 
-        // 茶杯放任意座椅
         if (!cupClueTriggered && objectId == "cup_01" && surfaceId != null && surfaceId.StartsWith(seatIdPrefix))
         {
             TriggerCupOnSeatClue();
         }
 
-        // 遥控器放屏幕
         if (objectId == remoteId && surfaceId == screenId)
         {
             ActivateScreen();
         }
     }
 
-    // ---------- 谜题逻辑 ----------
     private void CheckDoorCollection()
     {
         if (doorUnlocked) return;
@@ -189,20 +183,19 @@ public class PuzzleManager : MonoBehaviour
         // 显示提示
         GameResultUI ui = GameResultUI.GetOrCreate();
         if (ui != null)
-            ui.ShowMessage("你拿起茶杯，发现下面压着一张纸条：密码第一位是 3！");
+            ui.ShowMessage("You pick up the cup and find a note underneath: The first digit is 3!");
 
         // 加入背包
         InventoryManager inv = InventoryManager.GetOrCreate();
         if (inv != null)
         {
-            InventoryItem clue = new InventoryItem("cup_clue_note", "茶杯下的纸条", "note", "密码第一位是 3。");
+            InventoryItem clue = new InventoryItem("cup_clue_note", "Note under cup", "note", "The first digit is 3.");
             inv.AddItem(clue);
         }
 
-        Debug.Log("茶杯座椅线索已触发！");
+        Debug.Log("茶杯座椅线索已触发");
     }
 
-    // ---------- 辅助 ----------
     private string GetRootObjectId(GameObject obj)
     {
         if (obj == null) return null;
