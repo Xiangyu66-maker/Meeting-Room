@@ -8103,7 +8103,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d3cbe78bddd05d42aa304e0ba9dcaec, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GptVisionInteractionManager
   provider: 0
   openAiModel: gpt-5.4-mini
@@ -10716,8 +10716,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 570152990}
   exitPoint: {fileID: 1754233516}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &504512880
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10921,8 +10921,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 1813109056}
   exitPoint: {fileID: 2039357647}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &527907102
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18133,8 +18133,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 2124357676}
   exitPoint: {fileID: 1037286135}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &885648369
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21413,8 +21413,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -31585,8 +31585,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 374480510}
   exitPoint: {fileID: 83230407}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &1494877397
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -35827,7 +35827,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.6
+  m_Radius: 0.8
   m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!195 &1721073691
 NavMeshAgent:
