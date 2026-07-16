@@ -10,7 +10,6 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     [SerializeField] private bool runInEditMode = true;
     [SerializeField] private bool addFirstPersonInteractorToCamera = true;
 
-    // 原有重要ID集合（用于添加 InteractableObject 和 Collider）
     private static readonly HashSet<string> ImportantObjectIds = new HashSet<string>
     {
         "locked_door_01",
@@ -31,9 +30,10 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         "plant_02",
         "plant_03",
         "plant_04",
+        "cup_01",
+        "cup_02",
     };
 
-    // 可拾取物体的ID集合（这些物体将被添加 GrabbableObject）
     private static readonly HashSet<string> GrabbableObjectIds = new HashSet<string>
     {
         "remote_01",
@@ -43,7 +43,9 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         "plant_02",
         "plant_03",
         "plant_04",
-        // 可根据需要扩展，例如 "whiteboard_01" 如果希望可拿起
+        "cup_01",
+        "cup_02",
+
     };
 
     private static readonly Dictionary<string, Metadata> DefaultMetadata = new Dictionary<string, Metadata>

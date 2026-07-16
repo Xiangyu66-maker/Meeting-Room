@@ -10,8 +10,7 @@ using UnityEngine.UI;
 public sealed class PauseMenuController : MonoBehaviour
 {
     private const string MenuSceneName = "Menu";
-    private const string GameSceneName = "xiangyu";
-    private const string LegacyGameSceneName = "ConferenceRoom_before_blockout_sync";
+    private const string GameSceneName = "ConferenceRoom_before_blockout_sync";
 
     private GameObject pauseCanvas;
     private GameObject pausePanel;
@@ -158,8 +157,7 @@ public sealed class PauseMenuController : MonoBehaviour
 
     private static bool IsGameplayScene(string sceneName)
     {
-        return string.Equals(sceneName, GameSceneName, System.StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sceneName, LegacyGameSceneName, System.StringComparison.OrdinalIgnoreCase);
+        return string.Equals(sceneName, GameSceneName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private void EnsurePauseUI()

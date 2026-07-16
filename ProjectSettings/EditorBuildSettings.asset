@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 7df8897dcf8c6b941bf14ab9bd9c4d1c
   - enabled: 1
-    path: Assets/Scenes/xiangyu.unity
-    guid: 598178c0d01e71f4e85e093f342d7a35
+    path: Assets/Scenes/ConferenceRoom_before_blockout_sync.unity
+    guid: 6d5f0b4d5b1349a48bcf663728ad9f5a
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
