@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public sealed class MainMenuController : MonoBehaviour
 {
     private const string MenuSceneName = "Menu";
-    private const string GameSceneName = "xiangyu";
+    private const string GameSceneName = "ConferenceRoom_before_blockout_sync";
 
     private GameObject menuCanvas;
 
@@ -74,7 +74,7 @@ public sealed class MainMenuController : MonoBehaviour
     public void StartGame()
     {
         Time.timeScale = 1f;
-        Debug.Log("Start Game: loading xiangyu scene.", this);
+        Debug.Log($"Start Game: loading {GameSceneName} scene.", this);
         SceneManager.LoadScene(GameSceneName);
     }
 

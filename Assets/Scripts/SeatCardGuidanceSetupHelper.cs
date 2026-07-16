@@ -6,8 +6,7 @@ using UnityEngine.SceneManagement;
 [AddComponentMenu("Conference Room/Seat Card Guidance Setup Helper")]
 public sealed class SeatCardGuidanceSetupHelper : MonoBehaviour
 {
-    private const string GameplaySceneName = "xiangyu";
-    private const string LegacyGameplaySceneName = "ConferenceRoom_before_blockout_sync";
+    private const string GameplaySceneName = "ConferenceRoom_before_blockout_sync";
 
     [SerializeField] private bool runOnAwake = true;
     [SerializeField] private Transform playerTransform;
@@ -130,8 +129,7 @@ public sealed class SeatCardGuidanceSetupHelper : MonoBehaviour
 
     private static bool IsGameplayScene(string sceneName)
     {
-        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sceneName, LegacyGameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
+        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private static Transform FindPlayerTransform()
