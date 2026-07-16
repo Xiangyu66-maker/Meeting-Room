@@ -293,6 +293,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 12235714}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!208 &13579327
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160433997}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &15353944
 GameObject:
   m_ObjectHideFlags: 0
@@ -3117,6 +3133,7 @@ GameObject:
   - component: {fileID: 7300000033}
   - component: {fileID: 7900000014}
   - component: {fileID: 1269459194}
+  - component: {fileID: 13579327}
   m_Layer: 0
   m_Name: Left Back Floor Plant
   m_TagString: Untagged
@@ -7332,6 +7349,70 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342513102}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+<<<<<<< Updated upstream
+=======
+--- !u!1 &343893900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 343893902}
+  - component: {fileID: 343893901}
+  m_Layer: 0
+  m_Name: GPT InteractionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &343893901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 343893900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d3cbe78bddd05d42aa304e0ba9dcaec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GptVisionInteractionManager
+  provider: 0
+  openAiModel: gpt-5.4-mini
+  geminiModel: gemini-3.5-flash
+  openAiApiKeyEnvironmentVariable: OPENAI_API_KEY
+  geminiApiKeyEnvironmentVariable: GEMINI_API_KEY
+  captureResolution: 768
+  imageDetail: high
+  maxOutputTokens: 220
+  fieldOfView: 38
+  framingPadding: 1.35
+  showDebugOverlay: 1
+  instructions: "You are the visual recognition AI for a Unity meeting-room escape
+    prototype. You receive a screenshot of the object the player is interacting with.
+    First identify the visible object from the image, then give one natural Simplified
+    Chinese feedback sentence for the escape-room context. Do not rely only on object_id.
+    If the image is unclear, say it is unclear. Do not directly reveal the final
+    keypad password. Output format: Visual recognition: ... Feedback: ...\u53CD\u9988\u8BDD\u8BED\u4E00\u76F4\u5C55\u73B0\u66B4\u8E81\u4E0D\u8010\u70E6\u751A\u81F3\u53EF\u4EE5\u51FA\u73B0\u810F\u8BDD\uFF0C\u7C7B\u4F3C\u6DF7\u86CB\u8FD9\u6837\u7684\u5B57\u773C"
+--- !u!4 &343893902
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 343893900}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+>>>>>>> Stashed changes
 --- !u!1 &349454150
 GameObject:
   m_ObjectHideFlags: 0
@@ -19675,6 +19756,66 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1085976521}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+<<<<<<< Updated upstream
+=======
+--- !u!1 &1086354363
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1086354364}
+  - component: {fileID: 1086354365}
+  m_Layer: 0
+  m_Name: Locker (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1086354364
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086354363}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.69114333, z: -0, w: 0.7227177}
+  m_LocalPosition: {x: 7.6648865, y: 0.60914, z: -14.049475}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 527907100}
+  - {fileID: 1813109056}
+  - {fileID: 2039357647}
+  - {fileID: 1478576728}
+  - {fileID: 1263994975}
+  - {fileID: 1768922301}
+  - {fileID: 712077283}
+  - {fileID: 769119838}
+  - {fileID: 25453517}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -87.441, z: 0}
+--- !u!208 &1086354365
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086354363}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
+>>>>>>> Stashed changes
 --- !u!1 &1092142853
 GameObject:
   m_ObjectHideFlags: 0
@@ -45715,8 +45856,48 @@ MonoBehaviour:
   forwardRayDistance: 3
   downRayDistance: 5
   extraHeightOffset: 0
-  manualVerticalOffset: -0.25
+  manualVerticalOffset: 0
   drawDebugRays: 1
+<<<<<<< Updated upstream
+=======
+--- !u!208 &7900000021
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157177702}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 1, z: 0}
+  m_TimeToStationary: 0.1
+--- !u!65 &7900000022
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157177702}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 1, z: 0}
+>>>>>>> Stashed changes
 --- !u!114 &7900000100
 MonoBehaviour:
   m_ObjectHideFlags: 0
