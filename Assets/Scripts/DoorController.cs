@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [DisallowMultipleComponent]
 [AddComponentMenu("Conference Room/Door Controller")]
@@ -59,5 +59,8 @@ public sealed class DoorController : MonoBehaviour
             notifiedGameState = true;
             FindObjectOfType<GameStateManager>()?.NotifyDoorUnlocked();
         }
+
+        MeetingRoomAdaptiveGuide.NotifyDoorUnlocked();
     }
 }
+

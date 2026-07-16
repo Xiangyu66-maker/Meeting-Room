@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [DisallowMultipleComponent]
 [AddComponentMenu("Conference Room/Keypad Controller")]
@@ -64,6 +64,7 @@ public sealed class KeypadController : MonoBehaviour
         inputModeActive = true;
         currentInput = string.Empty;
         Debug.Log("Keypad input mode started. Type 0-9, Backspace to delete, Enter to submit, Escape to cancel.", this);
+        MeetingRoomAdaptiveGuide.NotifyKeypadInputStarted();
     }
 
     public void ConfigureDoor(DoorController door)
@@ -90,6 +91,7 @@ public sealed class KeypadController : MonoBehaviour
         if (currentInput == correctPassword)
         {
             Debug.Log("Correct password. Door unlocked.", this);
+            MeetingRoomAdaptiveGuide.NotifyPasswordAccepted();
             ResolveDoorController();
             if (doorController != null)
             {
@@ -106,6 +108,7 @@ public sealed class KeypadController : MonoBehaviour
         }
 
         Debug.Log("Wrong password. Try again.", this);
+        MeetingRoomAdaptiveGuide.NotifyPasswordRejected();
         currentInput = string.Empty;
     }
 
@@ -164,3 +167,4 @@ public sealed class KeypadController : MonoBehaviour
         GUI.Label(new Rect((Screen.width - 260f) * 0.5f, 132f, 260f, 24f), "Enter submits, Backspace deletes, Esc cancels");
     }
 }
+
