@@ -5,15 +5,16 @@ using UnityEngine;
 public sealed class FirstPersonInteractor : MonoBehaviour
 {
     [SerializeField] private Camera interactionCamera;
-    [SerializeField] private float interactionRange = 2f;   // �û�Ҫ��С��2m����ΪĬ��2m
+    [SerializeField] private float interactionRange = 2f;
     [SerializeField] private KeyCode interactKey = KeyCode.E;
-    [SerializeField] private KeyCode grabKey = KeyCode.F;   // ����ʰȡ/���ü�
+    [SerializeField] private KeyCode vlmKey = KeyCode.Q;
+    [SerializeField] private KeyCode grabKey = KeyCode.F;
     [SerializeField] private bool showDebugPrompt = true;
 
     private InteractableObject currentTarget;
     private InteractableObject lastLoggedTarget;
     private GrabbableObject currentGrabbableTarget;
-    private GrabbableObject heldObject;                     // ��ǰ���е�����
+    private GrabbableObject heldObject;
 
     private void Awake()
     {
@@ -22,7 +23,7 @@ public sealed class FirstPersonInteractor : MonoBehaviour
 
     private void Update()
     {
-        // �����������ģʽ��������н���
+        // Suspend world interaction while the keypad owns keyboard input.
         if (KeypadController.HasActiveInput)
         {
             currentTarget = null;
@@ -32,7 +33,6 @@ public sealed class FirstPersonInteractor : MonoBehaviour
 
         ResolveCamera();
 
-        // ---- ԭ�н����߼���E���� ----
         currentTarget = FindLookTarget();
 
         if (currentTarget != lastLoggedTarget)
@@ -49,8 +49,15 @@ public sealed class FirstPersonInteractor : MonoBehaviour
             currentTarget.Interact();
         }
 
-        // ---- ����ץȡ/�����߼���F���� ----
-        // ����ʰȡĿ�꣨����û�г�������ʱ�ż�⣩
+        if (currentTarget != null && Input.GetKeyDown(vlmKey))
+        {
+            GptVisionInteractionManager manager = GptVisionInteractionManager.Instance;
+            if (manager != null)
+            {
+                manager.AnalyzeObject(currentTarget.gameObject, currentTarget.ObjectId, currentTarget.Description);
+            }
+        }
+
         if (heldObject == null)
         {
             currentGrabbableTarget = FindGrabbableTarget();
@@ -64,22 +71,17 @@ public sealed class FirstPersonInteractor : MonoBehaviour
         {
             if (heldObject != null)
             {
-                // �ѳ������� �� ����
                 heldObject.Drop();
                 heldObject = null;
             }
             else if (currentGrabbableTarget != null)
             {
-                // δ��������׼��ʰȡ���� �� ʰȡ
                 currentGrabbableTarget.Grab(interactionCamera.transform);
                 heldObject = currentGrabbableTarget;
             }
         }
     }
 
-    /// <summary>
-    /// ���ҿɽ�������ԭ�У�
-    /// </summary>
     private InteractableObject FindLookTarget()
     {
         if (interactionCamera == null) return null;
@@ -91,9 +93,6 @@ public sealed class FirstPersonInteractor : MonoBehaviour
         return hit.collider.GetComponentInParent<InteractableObject>();
     }
 
-    /// <summary>
-    /// ���ҿ�ʰȡ����������
-    /// </summary>
     private GrabbableObject FindGrabbableTarget()
     {
         if (interactionCamera == null) return null;
@@ -128,13 +127,11 @@ public sealed class FirstPersonInteractor : MonoBehaviour
         if (!showDebugPrompt) return;
         if (KeypadController.HasActiveInput) return;
 
-        // ��ʾ������ʾ��E����
         if (currentTarget != null)
         {
-           GUI.Label(new Rect((Screen.width - 180f) * 0.5f, Screen.height - 72f, 180f, 28f), "Press E to interact | Q for VLM");
+            GUI.Label(new Rect((Screen.width - 260f) * 0.5f, Screen.height - 72f, 260f, 28f), "Press E to interact | Q for VLM");
         }
 
-        // ��ʾץȡ/������ʾ��F����
         if (heldObject != null)
         {
             GUI.Label(new Rect((Screen.width - 200f) * 0.5f, Screen.height - 108f, 200f, 28f), "Press F to drop");
