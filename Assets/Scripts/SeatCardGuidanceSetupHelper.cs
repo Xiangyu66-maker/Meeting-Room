@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [DisallowMultipleComponent]
 [AddComponentMenu("Conference Room/Seat Card Guidance Setup Helper")]
 public sealed class SeatCardGuidanceSetupHelper : MonoBehaviour
 {
+    private const string GameplaySceneName = "ConferenceRoom_before_blockout_sync";
+
     [SerializeField] private bool runOnAwake = true;
     [SerializeField] private Transform playerTransform;
     [SerializeField]
@@ -26,10 +29,19 @@ public sealed class SeatCardGuidanceSetupHelper : MonoBehaviour
         }
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void AutoSetupAfterSceneLoad()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void RegisterSceneLoadedHandler()
     {
-        SetupGuidanceSystem();
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+    }
+
+    private static void HandleSceneLoaded(Scene scene, LoadSceneMode loadMode)
+    {
+        if (IsGameplayScene(scene.name))
+        {
+            SetupGuidanceSystem();
+        }
     }
 
     [ContextMenu("Setup Seat Card Guidance")]
@@ -44,6 +56,12 @@ public sealed class SeatCardGuidanceSetupHelper : MonoBehaviour
 
     public static SeatCardGuidanceManager SetupGuidanceSystem()
     {
+        // 引导管理器只属于正式游戏场景，避免污染主菜单。
+        if (!IsGameplayScene())
+        {
+            return null;
+        }
+
         if (isSettingUp)
         {
             return FindFirstComponent<SeatCardGuidanceManager>();
@@ -102,6 +120,16 @@ public sealed class SeatCardGuidanceSetupHelper : MonoBehaviour
         {
             isSettingUp = false;
         }
+    }
+
+    private static bool IsGameplayScene()
+    {
+        return IsGameplayScene(SceneManager.GetActiveScene().name);
+    }
+
+    private static bool IsGameplayScene(string sceneName)
+    {
+        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private static Transform FindPlayerTransform()

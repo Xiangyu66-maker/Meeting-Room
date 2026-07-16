@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 [AddComponentMenu("Conference Room/Timed Guidance Sequence Manager")]
 public sealed class TimedGuidanceSequenceManager : MonoBehaviour
 {
+    private const string GameplaySceneName = "ConferenceRoom_before_blockout_sync";
+
     [System.Serializable]
     private sealed class TimedGuidanceStage
     {
@@ -87,10 +89,19 @@ public sealed class TimedGuidanceSequenceManager : MonoBehaviour
         sequenceStartTime = Time.time;
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void AutoSetupAfterSceneLoad()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void RegisterSceneLoadedHandler()
     {
-        SetupGuidanceSystem();
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+    }
+
+    private static void HandleSceneLoaded(Scene scene, LoadSceneMode loadMode)
+    {
+        if (IsGameplayScene(scene.name))
+        {
+            SetupGuidanceSystem();
+        }
     }
 
     [ContextMenu("Setup Timed Guidance")]
@@ -101,6 +112,12 @@ public sealed class TimedGuidanceSequenceManager : MonoBehaviour
 
     public static TimedGuidanceSequenceManager SetupGuidanceSystem()
     {
+        // 计时提示只在正式游戏场景中运行。
+        if (!IsGameplayScene())
+        {
+            return null;
+        }
+
         if (isSettingUp)
         {
             return FindFirstComponent<TimedGuidanceSequenceManager>();
@@ -151,6 +168,16 @@ public sealed class TimedGuidanceSequenceManager : MonoBehaviour
         {
             isSettingUp = false;
         }
+    }
+
+    private static bool IsGameplayScene()
+    {
+        return IsGameplayScene(SceneManager.GetActiveScene().name);
+    }
+
+    private static bool IsGameplayScene(string sceneName)
+    {
+        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private void HandleObjectInteracted(string objectId, InteractableObject source)

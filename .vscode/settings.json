@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Unity-Conference-Room-Demo-master.slnx"
+    "dotnet.defaultSolution": "Meeting-Room.slnx"
 }
