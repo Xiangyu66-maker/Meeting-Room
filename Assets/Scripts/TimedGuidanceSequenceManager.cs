@@ -6,8 +6,7 @@ using UnityEngine.SceneManagement;
 [AddComponentMenu("Conference Room/Timed Guidance Sequence Manager")]
 public sealed class TimedGuidanceSequenceManager : MonoBehaviour
 {
-    private const string GameplaySceneName = "xiangyu";
-    private const string LegacyGameplaySceneName = "ConferenceRoom_before_blockout_sync";
+    private const string GameplaySceneName = "ConferenceRoom_before_blockout_sync";
 
     [System.Serializable]
     private sealed class TimedGuidanceStage
@@ -178,8 +177,7 @@ public sealed class TimedGuidanceSequenceManager : MonoBehaviour
 
     private static bool IsGameplayScene(string sceneName)
     {
-        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sceneName, LegacyGameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
+        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private void HandleObjectInteracted(string objectId, InteractableObject source)

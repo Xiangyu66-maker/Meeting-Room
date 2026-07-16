@@ -7,8 +7,7 @@ public sealed class BackpackSetupHelper : MonoBehaviour
 {
     [SerializeField] private bool setupOnAwake = true;
 
-    private const string GameplaySceneName = "xiangyu";
-    private const string LegacyGameplaySceneName = "ConferenceRoom_before_blockout_sync";
+    private const string GameplaySceneName = "ConferenceRoom_before_blockout_sync";
     private const string CabinetObjectId = "cabinet_01";
     private const string DesktopComputerObjectId = "desktop_computer_01";
     private const string DesktopComputerNoteItemId = "note_desktop_password_hint";
@@ -96,8 +95,7 @@ public sealed class BackpackSetupHelper : MonoBehaviour
 
     private static bool IsGameplayScene(string sceneName)
     {
-        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sceneName, LegacyGameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
+        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private static void EnsureCabinetPickup()
