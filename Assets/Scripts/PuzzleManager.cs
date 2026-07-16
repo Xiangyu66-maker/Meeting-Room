@@ -11,6 +11,9 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField] private string screenId = "screen_01";
     [SerializeField] private string doorId = "locked_door_01";
 
+    [Header("±≠◊”≈‰÷√")]
+    [SerializeField] private string cupIdPrefix = "cup_";
+
     [Header("◊˘“Œ≈‰÷√")]
     [SerializeField] private string seatIdPrefix = "chair_";
 
@@ -114,7 +117,7 @@ public class PuzzleManager : MonoBehaviour
         Debug.Log($"Drop event: {objectId} on '{surface.name}', rootId='{surfaceId}'");
 
         // ≤Ë±≠∑≈»Œ“‚◊˘“Œ
-        if (!cupClueTriggered && objectId == "cup_01" && surfaceId != null && surfaceId.StartsWith(seatIdPrefix))
+        if (!cupClueTriggered && objectId.StartsWith("cup_") && surfaceId != null && surfaceId.StartsWith(seatIdPrefix))
         {
             TriggerCupOnSeatClue();
         }
