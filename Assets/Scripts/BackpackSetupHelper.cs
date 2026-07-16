@@ -7,6 +7,8 @@ public sealed class BackpackSetupHelper : MonoBehaviour
 {
     [SerializeField] private bool setupOnAwake = true;
 
+    private const string GameplaySceneName = "xiangyu";
+    private const string LegacyGameplaySceneName = "ConferenceRoom_before_blockout_sync";
     private const string CabinetObjectId = "cabinet_01";
     private const string DesktopComputerObjectId = "desktop_computer_01";
     private const string DesktopComputerNoteItemId = "note_desktop_password_hint";
@@ -34,15 +36,30 @@ public sealed class BackpackSetupHelper : MonoBehaviour
         }
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void SetupAfterSceneLoad()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void RegisterSceneLoadedHandler()
     {
-        SetupBackpackSystem();
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+    }
+
+    private static void HandleSceneLoaded(Scene scene, LoadSceneMode loadMode)
+    {
+        if (IsGameplayScene(scene.name))
+        {
+            SetupBackpackSystem();
+        }
     }
 
     [ContextMenu("Setup Backpack System")]
     public static void SetupBackpackSystem()
     {
+        // 背包仅在正式会议室场景中生成，避免出现在 Menu。
+        if (!IsGameplayScene())
+        {
+            return;
+        }
+
         GameObject root = FindOrCreateSystemRoot();
 
         InventoryManager inventoryManager = root.GetComponent<InventoryManager>();
@@ -69,6 +86,18 @@ public sealed class BackpackSetupHelper : MonoBehaviour
         EnsureCabinetPickup();
         EnsureSeatOrderPickup();
         EnsureDesktopComputerPickup();
+        Debug.Log($"Backpack system initialized in scene: {SceneManager.GetActiveScene().name}.", root);
+    }
+
+    private static bool IsGameplayScene()
+    {
+        return IsGameplayScene(SceneManager.GetActiveScene().name);
+    }
+
+    private static bool IsGameplayScene(string sceneName)
+    {
+        return string.Equals(sceneName, GameplaySceneName, System.StringComparison.OrdinalIgnoreCase)
+            || string.Equals(sceneName, LegacyGameplaySceneName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private static void EnsureCabinetPickup()
