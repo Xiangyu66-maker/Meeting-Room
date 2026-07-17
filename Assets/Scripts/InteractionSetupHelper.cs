@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -70,7 +70,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         { "plant_04", new Metadata("distractor", "Small table plant distractor.") },
     };
 
-    // TextMeshÉî¶ÈÎÄ×Ö²ÄÖÊ»º´æ
+    // TextMeshæ·±åº¦æ–‡å­—æè´¨ç¼“å­˜
     private static readonly Dictionary<Font, Material> DepthTextMaterials = new Dictionary<Font, Material>();
 
     private void Awake()
@@ -118,7 +118,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
 
         if (addFirstPersonInteractorToCamera)
         {
-            EnsureFirstPersonInteractor();
+            EnsureCameraGuidanceComponents();
         }
 
         Debug.Log($"Interaction setup complete. Found {byId.Count} ObjectIdentity components.", this);
@@ -162,7 +162,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         Debug.Log($"Added BoxCollider to {identity.ObjectId}.", identity);
     }
 
-    // È·±£¿ÉÊ°È¡ÎïÌå¹ÒÔØ GrabbableObject
+    // ç¡®ä¿å¯æ‹¾å–ç‰©ä½“æŒ‚è½½ GrabbableObject
     private static void EnsureGrabbable(ObjectIdentity identity)
     {
         if (!GrabbableObjectIds.Contains(identity.ObjectId))
@@ -209,7 +209,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         keypad.ConfigureDoor(door);
     }
 
-    #region TextMesh Éî¶ÈÍ¸Ã÷²ÄÖÊ´¦Àí
+    #region TextMesh æ·±åº¦é€æ˜æè´¨å¤„ç†
     private static void ApplyDepthTestedTextMaterials()
     {
         Shader textShader = Shader.Find("ConferenceRoom/World Text Depth");
@@ -280,7 +280,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
     }
     #endregion
 
-    private static void EnsureFirstPersonInteractor()
+    private static void EnsureCameraGuidanceComponents()
     {
         Camera targetCamera = Camera.main;
         if (targetCamera == null)
@@ -291,7 +291,7 @@ public sealed class InteractionSetupHelper : MonoBehaviour
 
         if (targetCamera == null)
         {
-            Debug.LogWarning("No camera found for FirstPersonInteractor setup.");
+            Debug.LogWarning("No camera found for guidance setup.");
             return;
         }
 
@@ -299,6 +299,18 @@ public sealed class InteractionSetupHelper : MonoBehaviour
         {
             targetCamera.gameObject.AddComponent<FirstPersonInteractor>();
             Debug.Log($"Added FirstPersonInteractor to camera {targetCamera.name}.", targetCamera);
+        }
+
+        if (targetCamera.GetComponent<CameraPromptSender>() == null)
+        {
+            targetCamera.gameObject.AddComponent<CameraPromptSender>();
+            Debug.Log($"Added CameraPromptSender to camera {targetCamera.name}.", targetCamera);
+        }
+
+        if (targetCamera.GetComponent<MeetingRoomAdaptiveGuide>() == null)
+        {
+            targetCamera.gameObject.AddComponent<MeetingRoomAdaptiveGuide>();
+            Debug.Log($"Added MeetingRoomAdaptiveGuide to camera {targetCamera.name}.", targetCamera);
         }
     }
 
