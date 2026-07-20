@@ -10781,7 +10781,7 @@ MonoBehaviour:
   hidePoint: {fileID: 570152990}
   exitPoint: {fileID: 1754233516}
   promptObject: {fileID: 1072509669}
-  promptText: {fileID: 0}
+  promptText: {fileID: 1072509671}
   lookSensitivity: 2
   horizontalLookLimit: 65
   verticalLookLimit: 35
@@ -10989,7 +10989,7 @@ MonoBehaviour:
   hidePoint: {fileID: 1813109056}
   exitPoint: {fileID: 2039357647}
   promptObject: {fileID: 1072509669}
-  promptText: {fileID: 0}
+  promptText: {fileID: 1072509671}
   lookSensitivity: 2
   horizontalLookLimit: 65
   verticalLookLimit: 35
@@ -18703,7 +18703,7 @@ MonoBehaviour:
   hidePoint: {fileID: 2124357676}
   exitPoint: {fileID: 1037286135}
   promptObject: {fileID: 1072509669}
-  promptText: {fileID: 0}
+  promptText: {fileID: 1072509671}
   lookSensitivity: 2
   horizontalLookLimit: 65
   verticalLookLimit: 35
@@ -32647,7 +32647,7 @@ MonoBehaviour:
   hidePoint: {fileID: 374480510}
   exitPoint: {fileID: 83230407}
   promptObject: {fileID: 1072509669}
-  promptText: {fileID: 0}
+  promptText: {fileID: 1072509671}
   lookSensitivity: 2
   horizontalLookLimit: 65
   verticalLookLimit: 35
