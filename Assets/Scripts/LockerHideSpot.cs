@@ -1,27 +1,51 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 
 public class LockerHideSpot : MonoBehaviour
 {
-    [Header("Settings")]
+    [Header("Interaction")]
     [SerializeField] private string playerTag = "Player";
     [SerializeField] private KeyCode interactKey = KeyCode.E;
 
-    [Header("Hide Position")]
+    [Header("Locker Positions")]
+    [Tooltip("Place this at the desired camera position inside the locker.")]
     [SerializeField] private Transform hidePoint;
+
+    [Tooltip("Place this outside the locker.")]
     [SerializeField] private Transform exitPoint;
 
-    [Header("UI")]
+    [Header("Prompt UI")]
     [SerializeField] private GameObject promptObject;
     [SerializeField] private TMP_Text promptText;
 
+    [Header("View Inside Locker")]
+    [SerializeField] private float lookSensitivity = 2f;
+
+    [Tooltip("Maximum left/right viewing angle from the locker slit.")]
+    [SerializeField] private float horizontalLookLimit = 65f;
+
+    [Tooltip("Maximum up/down viewing angle from the locker slit.")]
+    [SerializeField] private float verticalLookLimit = 35f;
+
     private Transform player;
+    private Transform playerCamera;
     private Rigidbody playerRigidbody;
 
-    private bool playerInRange = false;
-    private bool playerIsInsideLocker = false;
+    private Behaviour playerController;
+    private bool playerControllerWasEnabled;
+
+    private bool playerInRange;
+    private bool playerInsideLocker;
+
+    private Vector3 lockedPlayerPosition;
 
     private RigidbodyConstraints originalConstraints;
+    private bool originalUseGravity;
+
+    private float startingYaw;
+    private float startingPitch;
+    private float yawOffset;
+    private float pitchOffset;
 
     private void Start()
     {
@@ -30,6 +54,19 @@ public class LockerHideSpot : MonoBehaviour
 
     private void Update()
     {
+        if (playerInsideLocker)
+        {
+            // èº²è—æ—¶ç”±è¿™ä¸ªè„šæœ¬æ§åˆ¶è§†è§’
+            UpdateLockerView();
+
+            if (Input.GetKeyDown(interactKey))
+            {
+                ExitLocker();
+            }
+
+            return;
+        }
+
         if (!playerInRange || player == null)
         {
             return;
@@ -37,128 +74,258 @@ public class LockerHideSpot : MonoBehaviour
 
         if (Input.GetKeyDown(interactKey))
         {
-            Debug.Log("E key pressed near locker.");
-            ToggleHide();
+            EnterLocker();
         }
     }
 
-    private void ToggleHide()
+    private void LateUpdate()
     {
-        if (!playerIsInsideLocker)
+        if (!playerInsideLocker || player == null)
         {
-            EnterLocker();
+            return;
         }
-        else
+
+        // æ¯ä¸€å¸§é”å®šç©å®¶ä½ç½®ï¼Œé˜²æ­¢WASDæˆ–ç‰©ç†æŠŠç©å®¶ç§»èµ°
+        player.position = lockedPlayerPosition;
+
+        if (playerRigidbody != null)
         {
-            ExitLocker();
+            playerRigidbody.linearVelocity = Vector3.zero;
+            playerRigidbody.angularVelocity = Vector3.zero;
         }
+
+        // æ”¾åœ¨LateUpdateï¼Œé˜²æ­¢å…¶ä»–è„šæœ¬è¦†ç›–æ‘„åƒæœºæ–¹å‘
+        ApplyLockerView();
     }
 
     private void EnterLocker()
     {
-        playerIsInsideLocker = true;
+        if (hidePoint == null)
+        {
+            Debug.LogError("LockerHideSpot: HidePoint is not assigned.");
+            return;
+        }
 
+        Camera cameraComponent = player.GetComponentInChildren<Camera>(true);
+
+        if (cameraComponent == null)
+        {
+            Debug.LogError("LockerHideSpot: Player camera was not found.");
+            return;
+        }
+
+        playerCamera = cameraComponent.transform;
         playerRigidbody = player.GetComponent<Rigidbody>();
 
-        // ÏÈ°ÑÍæ¼Ò´«ËÍµ½´¢Îï¹ñÀïÃæ
-        if (hidePoint != null)
-        {
-            player.position = hidePoint.position;
-            player.rotation = hidePoint.rotation;
-        }
-        else
-        {
-            Debug.LogWarning("LockerHideSpot: HidePoint is not assigned.");
-        }
+        FindAndDisablePlayerController();
 
-        // ¹Ø¼ü²¿·Ö£º
-        // Ö»¶³½áÍæ¼ÒµÄÎ»ÖÃ£¬²»¶³½áĞı×ª
-        // ÕâÑùÍæ¼Ò²»ÄÜ×ßÂ·£¬µ«¿ÉÒÔ×ªÊÓ½Ç
+        /*
+         * HidePointè¡¨ç¤ºæ‘„åƒæœºçœ¼ç›çš„ä½ç½®ï¼Œè€Œä¸æ˜¯ç©å®¶è„šåº•çš„ä½ç½®ã€‚
+         * è¿™é‡Œæ ¹æ®æ‘„åƒæœºåœ¨Playerä¸­çš„åç§»ï¼Œè®¡ç®—Playeræ ¹ç‰©ä½“åº”æ”¾åœ¨å“ªé‡Œã€‚
+         */
+        Vector3 cameraLocalOffset =
+            player.InverseTransformPoint(playerCamera.position);
+
+        Quaternion desiredPlayerRotation =
+            Quaternion.Euler(0f, hidePoint.eulerAngles.y, 0f);
+
+        lockedPlayerPosition =
+            hidePoint.position -
+            desiredPlayerRotation * cameraLocalOffset;
+
+        player.SetPositionAndRotation(
+            lockedPlayerPosition,
+            desiredPlayerRotation
+        );
+
         if (playerRigidbody != null)
         {
             originalConstraints = playerRigidbody.constraints;
+            originalUseGravity = playerRigidbody.useGravity;
 
             playerRigidbody.linearVelocity = Vector3.zero;
             playerRigidbody.angularVelocity = Vector3.zero;
+            playerRigidbody.useGravity = false;
+            playerRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        }
 
-            playerRigidbody.constraints =
-                RigidbodyConstraints.FreezePositionX |
-                RigidbodyConstraints.FreezePositionY |
-                RigidbodyConstraints.FreezePositionZ;
-        }
-        else
-        {
-            Debug.LogWarning("LockerHideSpot: Player Rigidbody not found.");
-        }
+        /*
+         * å…³é”®éƒ¨åˆ†ï¼š
+         * åˆšè¿›å…¥æ—¶ï¼Œè§†è§’å®Œå…¨ç­‰äºHidePointçš„Rotationã€‚
+         */
+        startingYaw = hidePoint.eulerAngles.y;
+        startingPitch = NormalizeAngle(hidePoint.eulerAngles.x);
+
+        yawOffset = 0f;
+        pitchOffset = 0f;
+
+        playerCamera.rotation = hidePoint.rotation;
+
+        playerInsideLocker = true;
 
         PlayerHideState.SetHidden(true);
 
         ShowPrompt("Press E to exit");
 
-        Debug.Log("Player entered the locker. Player can look around.");
+        Debug.Log("Player entered locker and is facing the slit.");
+    }
+
+    private void UpdateLockerView()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * lookSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * lookSensitivity;
+
+        yawOffset += mouseX;
+        pitchOffset -= mouseY;
+
+        yawOffset = Mathf.Clamp(
+            yawOffset,
+            -horizontalLookLimit,
+            horizontalLookLimit
+        );
+
+        pitchOffset = Mathf.Clamp(
+            pitchOffset,
+            -verticalLookLimit,
+            verticalLookLimit
+        );
+    }
+
+    private void ApplyLockerView()
+    {
+        if (playerCamera == null)
+        {
+            return;
+        }
+
+        float finalYaw = startingYaw + yawOffset;
+        float finalPitch = startingPitch + pitchOffset;
+
+        playerCamera.rotation = Quaternion.Euler(
+            finalPitch,
+            finalYaw,
+            0f
+        );
     }
 
     private void ExitLocker()
     {
-        playerIsInsideLocker = false;
-
-        // ÏÈ°ÑÍæ¼Ò´«ËÍµ½¹ñ×ÓÍâÃæ
-        if (exitPoint != null)
+        if (exitPoint == null)
         {
-            player.position = exitPoint.position;
-            player.rotation = exitPoint.rotation;
-        }
-        else
-        {
-            Debug.LogWarning("LockerHideSpot: ExitPoint is not assigned.");
+            Debug.LogError("LockerHideSpot: ExitPoint is not assigned.");
+            return;
         }
 
-        // »Ö¸´Ô­±¾ Rigidbody ÉèÖÃ
+        playerInsideLocker = false;
+
+        PlayerHideState.SetHidden(false);
+
         if (playerRigidbody != null)
         {
             playerRigidbody.constraints = originalConstraints;
-
+            playerRigidbody.useGravity = originalUseGravity;
             playerRigidbody.linearVelocity = Vector3.zero;
             playerRigidbody.angularVelocity = Vector3.zero;
         }
 
-        PlayerHideState.SetHidden(false);
+        player.SetPositionAndRotation(
+            exitPoint.position,
+            Quaternion.Euler(0f, exitPoint.eulerAngles.y, 0f)
+        );
+
+        if (playerCamera != null)
+        {
+            playerCamera.rotation = exitPoint.rotation;
+        }
+
+        RestorePlayerController();
 
         ShowPrompt("Press E to hide");
 
-        Debug.Log("Player exited the locker.");
+        Debug.Log("Player exited locker.");
+    }
+
+    private void FindAndDisablePlayerController()
+    {
+        Behaviour[] scripts = player.GetComponents<Behaviour>();
+
+        foreach (Behaviour script in scripts)
+        {
+            if (script == null || script is PlayerHideState)
+            {
+                continue;
+            }
+
+            string scriptName = script.GetType().Name.ToLower();
+
+            if (scriptName.Contains("firstperson") ||
+                scriptName.Contains("fpscontroller") ||
+                scriptName.Contains("playercontroller") ||
+                scriptName.Contains("movement"))
+            {
+                playerController = script;
+                playerControllerWasEnabled = script.enabled;
+                script.enabled = false;
+
+                Debug.Log(
+                    "Temporarily disabled player controller: " +
+                    script.GetType().Name
+                );
+
+                return;
+            }
+        }
+
+        Debug.LogWarning(
+            "LockerHideSpot: Player controller was not automatically found."
+        );
+    }
+
+    private void RestorePlayerController()
+    {
+        if (playerController != null)
+        {
+            playerController.enabled = playerControllerWasEnabled;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(playerTag))
+        if (!other.CompareTag(playerTag))
         {
-            player = other.transform;
-            playerInRange = true;
-
-            if (!playerIsInsideLocker)
-            {
-                ShowPrompt("Press E to hide");
-            }
-
-            Debug.Log("Player entered locker range.");
+            return;
         }
+
+        player = other.transform;
+        playerInRange = true;
+
+        if (!playerInsideLocker)
+        {
+            ShowPrompt("Press E to hide");
+        }
+
+        Debug.Log("Player entered locker range.");
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag(playerTag))
+        if (!other.CompareTag(playerTag))
         {
-            if (!playerIsInsideLocker)
-            {
-                playerInRange = false;
-                player = null;
-
-                HidePrompt();
-
-                Debug.Log("Player left locker range.");
-            }
+            return;
         }
+
+        // è¿›å…¥æŸœå­åå¯èƒ½å·²ç»ç¦»å¼€Triggerï¼Œä»ç„¶è¦ä¿ç•™ç©å®¶å¼•ç”¨
+        if (playerInsideLocker)
+        {
+            return;
+        }
+
+        playerInRange = false;
+        player = null;
+
+        HidePrompt();
+
+        Debug.Log("Player left locker range.");
     }
 
     private void ShowPrompt(string message)
@@ -180,5 +347,15 @@ public class LockerHideSpot : MonoBehaviour
         {
             promptObject.SetActive(false);
         }
+    }
+
+    private float NormalizeAngle(float angle)
+    {
+        if (angle > 180f)
+        {
+            angle -= 360f;
+        }
+
+        return angle;
     }
 }
