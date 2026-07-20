@@ -41507,7 +41507,7 @@ MonoBehaviour:
   cooldownPrefix: 'NEXT SHOT: '
   shootingRange: 20
   shootingCooldown: 8
-  pigStunDuration: 3
+  pigStunDuration: 5
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
