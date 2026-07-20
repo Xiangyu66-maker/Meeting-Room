@@ -4443,6 +4443,69 @@ MonoBehaviour:
   vlmKey: 113
   grabKey: 102
   showDebugPrompt: 1
+--- !u!114 &201455269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 201455265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1521feef82526e84ab3d31e263e4c08c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeetingRoomAdaptiveGuide
+  promptSender: {fileID: 0}
+  playerTransform: {fileID: 0}
+  stuckSeconds: 20
+  requestAiOnStageChange: 1
+  requestAiWhenStuck: 1
+  repeatAiRequestSeconds: 20
+  useVisionFusion: 1
+  highVisionConfidence: 0.75
+  recentVisionSeconds: 12
+  enableHighlight: 1
+  highlightColor: {r: 1, g: 0.82, b: 0.18, a: 1}
+  operationHintColor: {r: 0.35, g: 0.9, b: 1, a: 1}
+  highlightPulseSpeed: 3
+  showDebugOverlay: 1
+--- !u!114 &201455270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 201455265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24a08a2aa6945de4f8e0af92f48e2544, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraPromptSender
+  endpointUrl: http://127.0.0.1:8000/guide
+  currentTask: Help the player solve the Meeting-Room escape puzzle by inspecting
+    the whiteboard clue, searching chair and seat-card clues for the door password,
+    then using the keypad to open the locked door.
+  sendKey: 103
+  sendOnStart: 0
+  adaptiveGuide: {fileID: 0}
+  useAdaptiveGuideContext: 1
+  playerTransform: {fileID: 0}
+  captureCamera: {fileID: 0}
+  includeCameraImage: 1
+  captureWidth: 512
+  captureHeight: 288
+  jpgQuality: 70
+  targetTransform: {fileID: 0}
+  targetId: whiteboard_01
+  targetName: Whiteboard
+  targetType: puzzle_clue
+  targetTag: Untagged
+  targetPosition: {x: 0, y: 1.5, z: 4}
+  targetRole: target
+  targetState: idle
+  logRequest: 1
+  logResponse: 1
+  logVisionText: 1
 --- !u!1 &205011694
 GameObject:
   m_ObjectHideFlags: 0
@@ -27113,7 +27176,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You can press <color=#FF0000>E</color> to find the clue in this room
+  m_text: You can press <color=#FF0000>E</color> / <color=#FF0000>Q</color> to find
+    the clue in this room
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -31119,6 +31183,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 201455267}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 201455270}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 201455269}
   m_SourcePrefab: {fileID: 100100000, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
 --- !u!1 &1490440406
 GameObject:
