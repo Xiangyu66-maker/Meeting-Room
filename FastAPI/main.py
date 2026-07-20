@@ -1,3 +1,4 @@
+import json
 import os
 import time
 from typing import List, Optional
@@ -50,11 +51,21 @@ class GuideRequest(BaseModel):
     image_base64: Optional[str] = None
 
 
+class VisionDiagnosis(BaseModel):
+    visible_objects: List[str] = Field(default_factory=list)
+    likely_current_focus: Optional[str] = None
+    target_visible: bool = False
+    target_confidence: float = 0.0
+    visual_stage_hint: Optional[str] = None
+    evidence: Optional[str] = None
+
+
 class GuideResponse(BaseModel):
     instruction: str
     model: str
     status: str
     vision_text: Optional[str] = None
+    vision_diagnosis: Optional[VisionDiagnosis] = None
     latency_ms: Optional[int] = None
 
 
@@ -124,9 +135,91 @@ def build_objects_text(objects: List[SceneObject]) -> str:
     return "\n".join(lines)
 
 
-def analyze_image_with_vlm(image_base64: Optional[str], objects_text: str) -> str:
+def get_recommended_target_id(request: GuideRequest) -> str:
+    for obj in request.objects:
+        if obj.state == "next_recommended_target":
+            return obj.id
+
+    for line in request.current_task.splitlines():
+        if "recommended_target_object:" in line:
+            return line.split("recommended_target_object:", 1)[1].strip()
+
+    return request.objects[0].id if request.objects else ""
+
+
+def parse_json_object(text: str) -> dict:
+    if not text:
+        return {}
+
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.strip("`")
+        if cleaned.lower().startswith("json"):
+            cleaned = cleaned[4:].strip()
+
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start >= 0 and end > start:
+        cleaned = cleaned[start:end + 1]
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        return {}
+
+
+def normalize_vision_diagnosis(data: dict) -> VisionDiagnosis:
+    visible_objects = data.get("visible_objects") or []
+    if isinstance(visible_objects, str):
+        visible_objects = [item.strip() for item in visible_objects.split(",") if item.strip()]
+    if not isinstance(visible_objects, list):
+        visible_objects = []
+
+    raw_target_visible = data.get("target_visible", False)
+    if isinstance(raw_target_visible, str):
+        target_visible = raw_target_visible.strip().lower() in {"true", "1", "yes", "visible"}
+    else:
+        target_visible = bool(raw_target_visible)
+
+    try:
+        target_confidence = float(data.get("target_confidence", 0.0))
+    except (TypeError, ValueError):
+        target_confidence = 0.0
+
+    target_confidence = max(0.0, min(1.0, target_confidence))
+
+    return VisionDiagnosis(
+        visible_objects=[str(item) for item in visible_objects],
+        likely_current_focus=data.get("likely_current_focus") or None,
+        target_visible=target_visible,
+        target_confidence=target_confidence,
+        visual_stage_hint=data.get("visual_stage_hint") or None,
+        evidence=data.get("evidence") or None,
+    )
+
+
+def format_vision_diagnosis(diagnosis: VisionDiagnosis) -> str:
+    visible = ", ".join(diagnosis.visible_objects) if diagnosis.visible_objects else "none"
+    focus = diagnosis.likely_current_focus or "unknown"
+    stage = diagnosis.visual_stage_hint or "Unknown"
+    evidence = diagnosis.evidence or "No visual evidence."
+    return (
+        f"visible_objects={visible}; "
+        f"likely_current_focus={focus}; "
+        f"target_visible={diagnosis.target_visible}; "
+        f"target_confidence={diagnosis.target_confidence:.2f}; "
+        f"visual_stage_hint={stage}; "
+        f"evidence={evidence}"
+    )
+
+
+def analyze_image_with_vlm(image_base64: Optional[str], request: GuideRequest) -> VisionDiagnosis:
     if not image_base64:
-        return "No visual input provided."
+        return VisionDiagnosis(evidence="No visual input provided.")
+
+    target_id = get_recommended_target_id(request)
+    known_object_ids = [obj.id for obj in request.objects]
+    objects_text = build_objects_text(request.objects)
 
     try:
         response = client.chat.completions.create(
@@ -136,8 +229,7 @@ def analyze_image_with_vlm(image_base64: Optional[str], objects_text: str) -> st
                     "role": "system",
                     "content": (
                         "You are a vision perception module for a Unity 3D puzzle game. "
-                        "Your job is to describe task-relevant visual information, "
-                        "not to give final player instructions."
+                        "Return reliable structured JSON only. Do not solve the puzzle."
                     )
                 },
                 {
@@ -146,55 +238,37 @@ def analyze_image_with_vlm(image_base64: Optional[str], objects_text: str) -> st
                         {
                             "type": "text",
                             "text": f"""
-Analyze this Unity game camera image for puzzle-game task guidance.
+Analyze this Unity game camera image for adaptive task guidance.
 
-Unity structured object data:
+Known Unity task context:
+{request.current_task}
+
+Known Unity objects:
 {objects_text}
 
-Your job is to generate a concise task-relevant visual summary.
-Do not give the final player instruction.
+Current recommended target object id from Unity:
+{target_id}
 
-Focus only on:
-1. Visible task-related objects
-2. Readable text, signs, symbols, numbers, or UI prompts
-3. Interactable objects
-4. Visible object states, such as locked, closed, opened, available
-5. Relationships between important objects
-6. Whether the image matches Unity object states
-7. Possible clues related to the current task
-8. Whether the Unity recommended target object is visible in the current camera image
+Known object ids:
+{known_object_ids}
 
-Important rules:
-- Unity object state is the ground truth.
-- Do not override Unity state based only on the image.
-- Do not claim an object is visible unless it is clearly visible in the image.
-- If the recommended target is not visible, say it is not visible or uncertain.
-- Do not solve the puzzle directly.
-- Do not give the final player instruction.
-- Do not give movement directions.
-- Do not describe irrelevant background details.
-- Keep the answer short and factual.
+Return ONLY valid JSON with this exact schema:
+{{
+  "visible_objects": ["object_id_if_visible"],
+  "likely_current_focus": "object_id_or_empty_string",
+  "target_visible": true,
+  "target_confidence": 0.0,
+  "visual_stage_hint": "FindWhiteboard | SearchSeatClues | UseKeypad | EnterPassword | Completed | Unknown",
+  "evidence": "short visual evidence"
+}}
 
-Return using this format:
-
-Visible objects:
-- ...
-
-Readable text / symbols:
-- ...
-
-Interactable elements:
-- ...
-
-Task-related clues:
-- ...
-
-Unity state alignment:
-- ...
-
-Recommended target visibility:
-- target_object_id: visible / not visible / uncertain
-- evidence: ...
+Rules:
+- visible_objects should use known Unity object ids when possible.
+- target_visible means the current recommended target appears clearly visible in the camera view.
+- target_confidence must be between 0 and 1.
+- If unsure, set target_visible=false and use low confidence.
+- Do not reveal the final password.
+- Do not output Markdown, comments, or extra text.
 """
                         },
                         {
@@ -209,11 +283,11 @@ Recommended target visibility:
             stream=False
         )
 
-        return response.choices[0].message.content.strip()
+        content = response.choices[0].message.content.strip()
+        return normalize_vision_diagnosis(parse_json_object(content))
 
-    except Exception as e:
-        print("VLM error:", str(e))
-        return "Visual analysis unavailable."
+    except Exception:
+        return VisionDiagnosis(evidence="Visual analysis unavailable.")
 
 
 def build_guidance_prompt(
@@ -346,6 +420,8 @@ def home():
         "vlm_model": VLM_MODEL_NAME,
         "base_url": BASE_URL
     }
+
+
 @app.post("/guide", response_model=GuideResponse)
 def generate_guidance(request: GuideRequest):
     start_time = time.time()
@@ -355,7 +431,8 @@ def generate_guidance(request: GuideRequest):
     memory = get_memory(session_id)
 
     objects_text = build_objects_text(request.objects)
-    vision_text = analyze_image_with_vlm(request.image_base64, objects_text)
+    vision_diagnosis = analyze_image_with_vlm(request.image_base64, request)
+    vision_text = format_vision_diagnosis(vision_diagnosis)
     prompt = build_guidance_prompt(request, objects_text, vision_text, memory)
 
     try:
@@ -393,6 +470,7 @@ def generate_guidance(request: GuideRequest):
             model=MODEL_NAME,
             status="success",
             vision_text=vision_text,
+            vision_diagnosis=vision_diagnosis,
             latency_ms=latency_ms
         )
 

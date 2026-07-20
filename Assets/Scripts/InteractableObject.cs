@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -25,6 +25,7 @@ public sealed class InteractableObject : MonoBehaviour
     }
 
     public string ObjectId => Identity != null ? Identity.ObjectId : gameObject.name;
+    public string Description => GetDescription();
 
     public static void NotifyExternalInteraction(string objectId, InteractableObject source = null)
     {
@@ -42,6 +43,11 @@ public sealed class InteractableObject : MonoBehaviour
         string description = GetDescription();
         Debug.Log($"Interacted with: {objectId} | {description}", this);
         NotifyExternalInteraction(objectId, this);
+        if (GptVisionInteractionManager.Instance != null)
+        {
+            GptVisionInteractionManager.Instance.AnalyzeObject(gameObject, objectId, description);
+        }
+        MeetingRoomAdaptiveGuide.NotifyObjectInteracted(objectId);
 
         switch (objectId)
         {
@@ -215,3 +221,4 @@ public sealed class InteractableObject : MonoBehaviour
 #endif
     }
 }
+

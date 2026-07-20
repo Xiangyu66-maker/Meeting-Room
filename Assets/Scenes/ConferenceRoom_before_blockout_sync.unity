@@ -4440,8 +4440,72 @@ MonoBehaviour:
   interactionCamera: {fileID: 0}
   interactionRange: 3
   interactKey: 101
+  vlmKey: 113
   grabKey: 102
   showDebugPrompt: 1
+--- !u!114 &201455269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 201455265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1521feef82526e84ab3d31e263e4c08c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeetingRoomAdaptiveGuide
+  promptSender: {fileID: 0}
+  playerTransform: {fileID: 0}
+  stuckSeconds: 20
+  requestAiOnStageChange: 1
+  requestAiWhenStuck: 1
+  repeatAiRequestSeconds: 20
+  useVisionFusion: 1
+  highVisionConfidence: 0.75
+  recentVisionSeconds: 12
+  enableHighlight: 1
+  highlightColor: {r: 1, g: 0.82, b: 0.18, a: 1}
+  operationHintColor: {r: 0.35, g: 0.9, b: 1, a: 1}
+  highlightPulseSpeed: 3
+  showDebugOverlay: 1
+--- !u!114 &201455270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 201455265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24a08a2aa6945de4f8e0af92f48e2544, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraPromptSender
+  endpointUrl: http://127.0.0.1:8000/guide
+  currentTask: Help the player solve the Meeting-Room escape puzzle by inspecting
+    the whiteboard clue, searching chair and seat-card clues for the door password,
+    then using the keypad to open the locked door.
+  sendKey: 103
+  sendOnStart: 0
+  adaptiveGuide: {fileID: 0}
+  useAdaptiveGuideContext: 1
+  playerTransform: {fileID: 0}
+  captureCamera: {fileID: 0}
+  includeCameraImage: 1
+  captureWidth: 512
+  captureHeight: 288
+  jpgQuality: 70
+  targetTransform: {fileID: 0}
+  targetId: whiteboard_01
+  targetName: Whiteboard
+  targetType: puzzle_clue
+  targetTag: Untagged
+  targetPosition: {x: 0, y: 1.5, z: 4}
+  targetRole: target
+  targetState: idle
+  logRequest: 1
+  logResponse: 1
+  logVisionText: 1
 --- !u!1 &205011694
 GameObject:
   m_ObjectHideFlags: 0
@@ -8075,6 +8139,67 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342513102}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &343893900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 343893902}
+  - component: {fileID: 343893901}
+  m_Layer: 0
+  m_Name: GPT InteractionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &343893901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 343893900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d3cbe78bddd05d42aa304e0ba9dcaec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GptVisionInteractionManager
+  provider: 0
+  openAiModel: gpt-5.4-mini
+  geminiModel: gemini-3.5-flash
+  openAiApiKeyEnvironmentVariable: OPENAI_API_KEY
+  geminiApiKeyEnvironmentVariable: GEMINI_API_KEY
+  captureResolution: 768
+  imageDetail: high
+  maxOutputTokens: 220
+  fieldOfView: 38
+  framingPadding: 1.35
+  showDebugOverlay: 1
+  instructions: "You are the visual recognition AI for a Unity meeting-room escape
+    prototype. You receive a screenshot of the object the player is interacting with.
+    First identify the visible object from the image, then give one natural Simplified
+    Chinese feedback sentence for the escape-room context. Do not rely only on object_id.
+    If the image is unclear, say it is unclear. Do not directly reveal the final
+    keypad password. Output format: Visual recognition: ... Feedback: ...\u53CD\u9988\u8BDD\u8BED\u4E00\u76F4\u5C55\u73B0\u66B4\u8E81\u4E0D\u8010\u70E6\u751A\u81F3\u53EF\u4EE5\u51FA\u73B0\u810F\u8BDD\uFF0C\u7C7B\u4F3C\u6DF7\u86CB\u8FD9\u6837\u7684\u5B57\u773C"
+--- !u!4 &343893902
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 343893900}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &349454150
 GameObject:
   m_ObjectHideFlags: 0
@@ -10654,8 +10779,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 570152990}
   exitPoint: {fileID: 1754233516}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &504512880
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10859,8 +10984,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 1813109056}
   exitPoint: {fileID: 2039357647}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &527907102
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18071,8 +18196,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 2124357676}
   exitPoint: {fileID: 1037286135}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &885648369
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21351,8 +21476,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -23791,6 +23916,8 @@ GameObject:
   - component: {fileID: 7300000034}
   - component: {fileID: 7900000015}
   - component: {fileID: 7900000020}
+  - component: {fileID: 7900000022}
+  - component: {fileID: 7900000021}
   m_Layer: 0
   m_Name: Right Back Floor Plant
   m_TagString: Untagged
@@ -27049,7 +27176,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You can press <color=#FF0000>E</color> to find the clue in this room
+  m_text: You can press <color=#FF0000>E</color> / <color=#FF0000>Q</color> to find
+    the clue in this room
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -31055,6 +31183,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 201455267}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 201455270}
+    - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 201455269}
   m_SourcePrefab: {fileID: 100100000, guid: c6453f8e1f814744d8b94e5a6d1f9942, type: 3}
 --- !u!1 &1490440406
 GameObject:
@@ -31521,8 +31657,8 @@ MonoBehaviour:
   interactKey: 101
   hidePoint: {fileID: 374480510}
   exitPoint: {fileID: 83230407}
-  promptObject: {fileID: 0}
-  promptText: {fileID: 0}
+  promptObject: {fileID: 1072509669}
+  promptText: {fileID: 1072509671}
 --- !u!65 &1494877397
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -35706,6 +35842,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1721073689}
+    - targetCorrespondingSourceObject: {fileID: 6081896307724654165, guid: 1dace64ff89a8f64aa3f5cbd6731b63f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1721073694}
   m_SourcePrefab: {fileID: 100100000, guid: 1dace64ff89a8f64aa3f5cbd6731b63f, type: 3}
 --- !u!1 &1721073688 stripped
 GameObject:
@@ -35759,7 +35899,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.6
+  m_Radius: 0.8
   m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!195 &1721073691
 NavMeshAgent:
@@ -35814,6 +35954,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPigCatchPlayer
   playerTag: Player
+--- !u!136 &1721073694
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1721073688}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.7
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.4, z: 0}
 --- !u!1 &1721642290
 GameObject:
   m_ObjectHideFlags: 0
@@ -42379,7 +42542,7 @@ RectTransform:
   m_GameObject: {fileID: 2014979702}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1493835320}
@@ -50155,6 +50318,43 @@ MonoBehaviour:
   extraHeightOffset: 0
   manualVerticalOffset: -0.25
   drawDebugRays: 1
+--- !u!208 &7900000021
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157177702}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 1, z: 0}
+  m_TimeToStationary: 0.1
+--- !u!65 &7900000022
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157177702}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &7900000100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50374,6 +50574,7 @@ SceneRoots:
   - {fileID: 1650224854}
   - {fileID: 1656782733}
   - {fileID: 1963651151}
+  - {fileID: 343893902}
   - {fileID: 1721073687}
   - {fileID: 2014979706}
   - {fileID: 1000855649}
