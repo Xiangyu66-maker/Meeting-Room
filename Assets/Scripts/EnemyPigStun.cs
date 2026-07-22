@@ -5,12 +5,26 @@ using UnityEngine.AI;
 public class EnemyPigStun : MonoBehaviour
 {
     [Header("Knockback Settings")]
+    [Tooltip("中枪后后退的距离")]
     [SerializeField] private float knockbackDistance = 2f;
+
+    [Tooltip("击退运动持续时间")]
     [SerializeField] private float knockbackDuration = 0.25f;
-    [SerializeField] private float knockbackHeight = 0.35f;
+
+    [Tooltip("击退时轻微腾空的高度")]
+    [SerializeField] private float knockbackHeight = 0.25f;
+
+    [Header("Rage Settings")]
+    [Tooltip("每次中枪后增加的追逐速度")]
+    [SerializeField] private float speedIncreasePerHit = 0.1f;
+
+    [Tooltip("猪最终能够达到的最大追逐速度")]
+    [SerializeField] private float maximumSpeed = 1.5f;
 
     private EnemyPigChase chaseScript;
     private EnemyPigCatchPlayer catchScript;
+    private PigRageVisual rageVisual;
+
     private NavMeshAgent agent;
     private Animator pigAnimator;
 
@@ -21,61 +35,189 @@ public class EnemyPigStun : MonoBehaviour
     private bool catchWasEnabled;
     private bool agentWasEnabled;
     private bool agentWasStopped;
+
     private float previousAnimatorSpeed = 1f;
+
+    private float startingSpeed;
+    private float currentRageSpeed;
+    private int rageLevel;
+
+    public int RageLevel
+    {
+        get { return rageLevel; }
+    }
+
+    public float CurrentSpeed
+    {
+        get { return currentRageSpeed; }
+    }
 
     private void Awake()
     {
-        chaseScript = GetComponent<EnemyPigChase>();
-        catchScript = GetComponent<EnemyPigCatchPlayer>();
-        agent = GetComponent<NavMeshAgent>();
-        pigAnimator = GetComponentInChildren<Animator>();
+        chaseScript =
+            GetComponent<EnemyPigChase>();
+
+        catchScript =
+            GetComponent<EnemyPigCatchPlayer>();
+
+        rageVisual =
+            GetComponent<PigRageVisual>();
+
+        agent =
+            GetComponent<NavMeshAgent>();
+
+        pigAnimator =
+            GetComponentInChildren<Animator>();
+
+        /*
+         * 从EnemyPigChase读取当前初始速度。
+         */
+        if (chaseScript != null)
+        {
+            startingSpeed =
+                chaseScript.CurrentChaseSpeed;
+        }
+        else if (agent != null)
+        {
+            startingSpeed =
+                agent.speed;
+        }
+        else
+        {
+            startingSpeed = 0.8f;
+        }
+
+        currentRageSpeed =
+            startingSpeed;
+
+        rageLevel = 0;
 
         if (pigAnimator != null)
         {
-            previousAnimatorSpeed = pigAnimator.speed;
+            previousAnimatorSpeed =
+                pigAnimator.speed;
+        }
+
+        if (rageVisual != null)
+        {
+            rageVisual.SetRageAmount(0f);
         }
     }
 
-    public void Stun(float duration, Vector3 shotDirection)
+    /// <summary>
+    /// 玩家武器击中猪时调用。
+    /// duration = 眩晕时间
+    /// shotDirection = 子弹飞行方向
+    /// </summary>
+    public void Stun(
+        float duration,
+        Vector3 shotDirection)
     {
         if (duration <= 0f)
         {
             return;
         }
 
-        // 第一次被击中时保存猪原来的状态
+        /*
+         * 每次中枪都会提高速度并增加红色程度。
+         */
+        IncreaseRage();
+
+        /*
+         * 只有第一次进入眩晕时，
+         * 才保存猪之前的组件状态。
+         */
         if (!isStunned)
         {
             chaseWasEnabled =
-                chaseScript != null && chaseScript.enabled;
+                chaseScript != null &&
+                chaseScript.enabled;
 
             catchWasEnabled =
-                catchScript != null && catchScript.enabled;
+                catchScript != null &&
+                catchScript.enabled;
 
             if (agent != null)
             {
-                agentWasEnabled = agent.enabled;
+                agentWasEnabled =
+                    agent.enabled;
 
-                if (agent.enabled && agent.isOnNavMesh)
+                if (agent.enabled &&
+                    agent.isOnNavMesh)
                 {
-                    agentWasStopped = agent.isStopped;
+                    agentWasStopped =
+                        agent.isStopped;
                 }
             }
 
             if (pigAnimator != null)
             {
-                previousAnimatorSpeed = pigAnimator.speed;
+                previousAnimatorSpeed =
+                    pigAnimator.speed;
             }
         }
 
-        // 眩晕期间再次中枪，会重新计算时间并再次击退
+        /*
+         * 眩晕期间再次中枪：
+         * 重新开始完整的眩晕计时。
+         */
         if (stunCoroutine != null)
         {
             StopCoroutine(stunCoroutine);
         }
 
         stunCoroutine = StartCoroutine(
-            StunRoutine(duration, shotDirection)
+            StunRoutine(
+                duration,
+                shotDirection
+            )
+        );
+    }
+
+    private void IncreaseRage()
+    {
+        rageLevel++;
+
+        currentRageSpeed = Mathf.Min(
+            startingSpeed +
+            rageLevel * speedIncreasePerHit,
+            maximumSpeed
+        );
+
+        /*
+         * 更新EnemyPigChase保存的追逐速度。
+         */
+        if (chaseScript != null)
+        {
+            chaseScript.SetChaseSpeed(
+                currentRageSpeed
+            );
+        }
+
+        /*
+         * 把当前速度换算成0～1的红色程度。
+         */
+        float rageAmount =
+            Mathf.InverseLerp(
+                startingSpeed,
+                maximumSpeed,
+                currentRageSpeed
+            );
+
+        if (rageVisual != null)
+        {
+            rageVisual.SetRageAmount(
+                rageAmount
+            );
+        }
+
+        Debug.Log(
+            "Pig Rage Level: " +
+            rageLevel +
+            " | Speed: " +
+            currentRageSpeed.ToString("F1") +
+            " | Red Amount: " +
+            rageAmount.ToString("F2")
         );
     }
 
@@ -85,25 +227,31 @@ public class EnemyPigStun : MonoBehaviour
     {
         isStunned = true;
 
-        // 停止追逐
+        /*
+         * 停止追逐和抓人。
+         */
         if (chaseScript != null)
         {
             chaseScript.enabled = false;
         }
 
-        // 眩晕时不能抓玩家
         if (catchScript != null)
         {
             catchScript.enabled = false;
         }
 
-        // 暂停动画
+        /*
+         * 暂停动画。
+         */
         if (pigAnimator != null)
         {
             pigAnimator.speed = 0f;
         }
 
-        // 停止并暂时关闭 NavMeshAgent
+        /*
+         * 停止并关闭NavMeshAgent，
+         * 让脚本手动控制击退位移。
+         */
         if (agent != null && agent.enabled)
         {
             if (agent.isOnNavMesh)
@@ -115,140 +263,194 @@ public class EnemyPigStun : MonoBehaviour
             agent.enabled = false;
         }
 
-        // 只保留水平方向，避免猪沿着上下方向乱飞
-        Vector3 knockbackDirection = shotDirection;
+        /*
+         * 只保留水平方向。
+         */
+        Vector3 knockbackDirection =
+            shotDirection;
+
         knockbackDirection.y = 0f;
 
-        if (knockbackDirection.sqrMagnitude < 0.001f)
+        if (knockbackDirection.sqrMagnitude <
+            0.001f)
         {
-            knockbackDirection = -transform.forward;
+            knockbackDirection =
+                -transform.forward;
         }
 
         knockbackDirection.Normalize();
 
-        Vector3 startPosition = transform.position;
+        Vector3 startPosition =
+            transform.position;
+
         Vector3 wantedPosition =
             startPosition +
-            knockbackDirection * knockbackDistance;
+            knockbackDirection *
+            knockbackDistance;
+
+        Vector3 targetPosition =
+            wantedPosition;
 
         /*
-         * 检查后方是不是NavMesh边缘或障碍。
-         * 避免猪被击退到墙里或地图外。
+         * 防止击退到NavMesh以外或穿过墙壁。
          */
-        Vector3 targetPosition = wantedPosition;
-
         if (NavMesh.Raycast(
                 startPosition,
                 wantedPosition,
-                out NavMeshHit navHit,
+                out NavMeshHit blockingHit,
                 NavMesh.AllAreas))
         {
             targetPosition =
-                navHit.position -
+                blockingHit.position -
                 knockbackDirection * 0.15f;
         }
 
         float elapsedTime = 0f;
 
-        while (elapsedTime < knockbackDuration)
+        while (elapsedTime <
+               knockbackDuration)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime +=
+                Time.deltaTime;
 
-            float t = Mathf.Clamp01(
-                elapsedTime / knockbackDuration
-            );
+            float progress =
+                Mathf.Clamp01(
+                    elapsedTime /
+                    knockbackDuration
+                );
 
-            // 让运动开始快、结束慢
-            float smoothT =
-                1f - Mathf.Pow(1f - t, 3f);
+            /*
+             * 开始较快，结束时逐渐减慢。
+             */
+            float smoothProgress =
+                1f -
+                Mathf.Pow(
+                    1f - progress,
+                    3f
+                );
 
-            Vector3 newPosition = Vector3.Lerp(
-                startPosition,
-                targetPosition,
-                smoothT
-            );
+            Vector3 newPosition =
+                Vector3.Lerp(
+                    startPosition,
+                    targetPosition,
+                    smoothProgress
+                );
 
-            // 增加一个很小的腾空弧线
+            /*
+             * 轻微腾空弧线。
+             */
             newPosition.y +=
-                Mathf.Sin(t * Mathf.PI) *
+                Mathf.Sin(
+                    progress *
+                    Mathf.PI
+                ) *
                 knockbackHeight;
 
-            transform.position = newPosition;
+            transform.position =
+                newPosition;
 
             yield return null;
         }
 
-        // 保证最后落回NavMesh附近
+        /*
+         * 击退结束后落回最近的NavMesh。
+         */
         if (NavMesh.SamplePosition(
                 targetPosition,
                 out NavMeshHit landingHit,
                 2f,
                 NavMesh.AllAreas))
         {
-            transform.position = landingHit.position;
+            transform.position =
+                landingHit.position;
         }
         else
         {
-            transform.position = targetPosition;
+            transform.position =
+                targetPosition;
         }
 
-        Debug.Log(
-            "Pig was knocked back and stunned for " +
-            duration +
-            " seconds."
-        );
-
-        // 击退过程也算在眩晕时间内
+        /*
+         * 击退时间包含在总眩晕时间中。
+         */
         float remainingStunTime =
-            Mathf.Max(0f, duration - knockbackDuration);
+            Mathf.Max(
+                0f,
+                duration -
+                knockbackDuration
+            );
 
-        yield return new WaitForSeconds(remainingStunTime);
+        yield return new WaitForSeconds(
+            remainingStunTime
+        );
 
         RestorePig();
 
         isStunned = false;
         stunCoroutine = null;
 
-        Debug.Log("Pig recovered from stun.");
+        Debug.Log(
+            "Pig recovered. Chase speed: " +
+            currentRageSpeed.ToString("F1")
+        );
     }
 
     private void RestorePig()
     {
-        // 先恢复NavMeshAgent
-        if (agent != null && agentWasEnabled)
+        /*
+         * 先恢复NavMeshAgent。
+         */
+        if (agent != null &&
+            agentWasEnabled)
         {
             if (NavMesh.SamplePosition(
                     transform.position,
-                    out NavMeshHit hit,
+                    out NavMeshHit nearestHit,
                     2f,
                     NavMesh.AllAreas))
             {
-                transform.position = hit.position;
+                transform.position =
+                    nearestHit.position;
             }
 
             agent.enabled = true;
 
             if (agent.isOnNavMesh)
             {
-                agent.Warp(transform.position);
-                agent.isStopped = agentWasStopped;
+                agent.Warp(
+                    transform.position
+                );
+
+                agent.speed =
+                    currentRageSpeed;
+
+                agent.isStopped =
+                    agentWasStopped;
             }
         }
 
-        // 再恢复追逐与抓人，避免脚本访问关闭的Agent
+        /*
+         * 再恢复追逐和抓人脚本。
+         */
         if (chaseScript != null)
         {
-            chaseScript.enabled = chaseWasEnabled;
+            chaseScript.enabled =
+                chaseWasEnabled;
         }
 
         if (catchScript != null)
         {
-            catchScript.enabled = catchWasEnabled;
+            catchScript.enabled =
+                catchWasEnabled;
         }
 
+        /*
+         * 恢复动画。
+         */
         if (pigAnimator != null)
         {
-            pigAnimator.speed = previousAnimatorSpeed;
+            pigAnimator.speed =
+                previousAnimatorSpeed;
         }
     }
 }
