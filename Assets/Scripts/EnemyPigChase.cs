@@ -7,18 +7,26 @@ public class EnemyPigChase : MonoBehaviour
     [SerializeField] private Transform player;
 
     [Header("Chase Settings")]
-    [SerializeField] private float chaseSpeed = 3.5f;
+    [Tooltip("猪追逐玩家时的初始速度")]
+    [SerializeField] private float chaseSpeed = 0.8f;
+
     [SerializeField] private float stoppingDistance = 0.2f;
 
     [Header("Patrol Settings")]
-    [SerializeField] private float patrolSpeed = 2.0f;
+    [Tooltip("玩家躲藏时，猪的巡逻速度")]
+    [SerializeField] private float patrolSpeed = 0.5f;
+
     [SerializeField] private float patrolRadius = 8f;
     [SerializeField] private float patrolWaitTime = 2f;
 
     private NavMeshAgent agent;
-    private float patrolTimer = 0f;
+    private float patrolTimer;
+    private bool wasHiddenLastFrame;
 
-    private bool wasHiddenLastFrame = false;
+    public float CurrentChaseSpeed
+    {
+        get { return chaseSpeed; }
+    }
 
     private void Start()
     {
@@ -26,7 +34,11 @@ public class EnemyPigChase : MonoBehaviour
 
         if (agent == null)
         {
-            Debug.LogError("EnemyPigChase: No NavMeshAgent found.");
+            Debug.LogError(
+                "EnemyPigChase: No NavMeshAgent found."
+            );
+
+            enabled = false;
             return;
         }
 
@@ -35,7 +47,8 @@ public class EnemyPigChase : MonoBehaviour
 
         if (player == null)
         {
-            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            GameObject playerObject =
+                GameObject.FindGameObjectWithTag("Player");
 
             if (playerObject != null)
             {
@@ -43,21 +56,26 @@ public class EnemyPigChase : MonoBehaviour
             }
             else
             {
-                Debug.LogError("EnemyPigChase: Cannot find object with tag Player.");
+                Debug.LogError(
+                    "EnemyPigChase: Cannot find Player tag."
+                );
             }
         }
     }
 
     private void Update()
     {
-        if (agent == null)
+        /*
+         * 眩晕脚本可能暂时关闭NavMeshAgent，
+         * 所以要先检查Agent是否可用。
+         */
+        if (agent == null || !agent.enabled)
         {
             return;
         }
 
         if (!agent.isOnNavMesh)
         {
-            Debug.LogWarning("EnemyPigChase: Pig is not on NavMesh.");
             return;
         }
 
@@ -80,25 +98,8 @@ public class EnemyPigChase : MonoBehaviour
             ChasePlayer();
         }
 
-        wasHiddenLastFrame = PlayerHideState.IsHidden;
-    }
-
-    private void OnPlayerStartedHiding()
-    {
-        Debug.Log("Player is hidden. Pig stops chasing and starts patrolling.");
-
-        agent.ResetPath();
-        patrolTimer = patrolWaitTime;
-
-        SetRandomPatrolDestination();
-    }
-
-    private void OnPlayerStoppedHiding()
-    {
-        Debug.Log("Player came out. Pig resumes chasing.");
-
-        agent.ResetPath();
-        patrolTimer = 0f;
+        wasHiddenLastFrame =
+            PlayerHideState.IsHidden;
     }
 
     private void ChasePlayer()
@@ -118,7 +119,9 @@ public class EnemyPigChase : MonoBehaviour
         agent.speed = patrolSpeed;
         agent.stoppingDistance = 0.2f;
 
-        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+        if (!agent.pathPending &&
+            agent.remainingDistance <=
+            agent.stoppingDistance)
         {
             patrolTimer += Time.deltaTime;
 
@@ -130,18 +133,68 @@ public class EnemyPigChase : MonoBehaviour
         }
     }
 
+    private void OnPlayerStartedHiding()
+    {
+        Debug.Log(
+            "Player is hidden. Pig starts patrolling."
+        );
+
+        agent.ResetPath();
+        patrolTimer = patrolWaitTime;
+
+        SetRandomPatrolDestination();
+    }
+
+    private void OnPlayerStoppedHiding()
+    {
+        Debug.Log(
+            "Player came out. Pig resumes chasing."
+        );
+
+        agent.ResetPath();
+        patrolTimer = 0f;
+    }
+
     private void SetRandomPatrolDestination()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
+        Vector3 randomDirection =
+            Random.insideUnitSphere * patrolRadius;
+
         randomDirection += transform.position;
         randomDirection.y = transform.position.y;
 
-        NavMeshHit hit;
-
-        if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(
+                randomDirection,
+                out NavMeshHit hit,
+                patrolRadius,
+                NavMesh.AllAreas))
         {
             agent.SetDestination(hit.position);
-            Debug.Log("Pig is patrolling randomly.");
         }
+    }
+
+    /// <summary>
+    /// EnemyPigStun调用此方法修改追逐速度。
+    /// </summary>
+    public void SetChaseSpeed(float newSpeed)
+    {
+        chaseSpeed = Mathf.Max(0f, newSpeed);
+
+        /*
+         * 如果当前正在追逐，立即更新。
+         * 如果玩家正在躲藏，继续使用Patrol Speed。
+         */
+        if (agent != null &&
+            agent.enabled &&
+            agent.isOnNavMesh &&
+            !PlayerHideState.IsHidden)
+        {
+            agent.speed = chaseSpeed;
+        }
+
+        Debug.Log(
+            "Pig chase speed changed to: " +
+            chaseSpeed.ToString("F1")
+        );
     }
 }

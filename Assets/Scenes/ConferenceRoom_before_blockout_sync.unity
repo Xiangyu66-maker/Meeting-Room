@@ -802,7 +802,11 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'EMERGENCY WEAPON
 
-    STORED IN LOCKER 03'
+    STORED IN LOCKER 03// Left ctrl to roll
+
+
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -22442,8 +22446,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -32676,6 +32680,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1896613198}
+    - targetCorrespondingSourceObject: {fileID: 100006, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1896613203}
     - targetCorrespondingSourceObject: {fileID: 100004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
         type: 3}
       insertIndex: -1
@@ -37864,6 +37872,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1721073697}
+    - targetCorrespondingSourceObject: {fileID: 6081896307724654165, guid: 1dace64ff89a8f64aa3f5cbd6731b63f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1721073700}
   m_SourcePrefab: {fileID: 100100000, guid: 1dace64ff89a8f64aa3f5cbd6731b63f, type: 3}
 --- !u!1 &1721073688 stripped
 GameObject:
@@ -37929,11 +37941,11 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 0.8
+  m_Acceleration: 2
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -37956,7 +37968,7 @@ MonoBehaviour:
   player: {fileID: 0}
   chaseSpeed: 0.8
   stoppingDistance: 0.2
-  patrolSpeed: 2
+  patrolSpeed: 0.5
   patrolRadius: 8
   patrolWaitTime: 2
 --- !u!114 &1721073693
@@ -38007,9 +38019,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4291183d8f624c41b1cd2e5e1848eca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPigStun
-  knockbackDistance: 2
-  knockbackDuration: 0.25
-  knockbackHeight: 0.35
+  knockbackDistance: 3
+  knockbackDuration: 0.35
+  knockbackHeight: 0.4
+  speedIncreasePerHit: 0.3
+  maximumSpeed: 2.6
+--- !u!114 &1721073700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1721073688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cca58b9090e18745a85afe91b96f6ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PigRageVisual
+  targetRenderers: []
+  maximumRageColor: {r: 1, g: 0, b: 0, a: 1}
+  maximumColourBlend: 0.694
+  useEmission: 1
+  emissionColor: {r: 1, g: 0, b: 0, a: 1}
+  maximumEmissionIntensity: 1
 --- !u!1 &1721642290
 GameObject:
   m_ObjectHideFlags: 0
@@ -41507,10 +41539,43 @@ MonoBehaviour:
   cooldownPrefix: 'NEXT SHOT: '
   shootingRange: 20
   shootingCooldown: 8
-  pigStunDuration: 3
+  pigStunDuration: 5
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1896613199 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 11400004, guid: c6453f8e1f814744d8b94e5a6d1f9942,
+    type: 3}
+  m_PrefabInstance: {fileID: 1481760681}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896613192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c9795a96c094f4cbde4d65546aa9b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1896613203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896613192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af375a22d1a89f41930f61ddf421750, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRoll
+  movementController: {fileID: 1896613199}
+  playerCamera: {fileID: 201455275}
+  rollKey: 306
+  rollSpeed: 10
+  rollDuration: 0.7
+  rollCooldown: 1.2
+  rollForwardWithoutInput: 1
+  cameraTiltAngle: 0
+  useCameraTilt: 1
 --- !u!1 &1897008642
 GameObject:
   m_ObjectHideFlags: 0
